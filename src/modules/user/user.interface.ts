@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { boolean } from "zod";
 
 // Assuming TUserRole is an enum based on previous context
 export type TUserRole = 'admin' | 'user';
@@ -23,6 +24,14 @@ export type TUser = {
   passwordChangeTime?: Date;
   fcmToken?: string;
 };
+
+export type TUserHabits= {
+  habit_id:Types.ObjectId,
+  isPusNotification:boolean,
+  reminderTime:Date,
+  reminderInterval:Number,
+  reminderDays:String[]
+}
 
 export type TSleepQuality =
   | { quality: 'excellent'; lowerLimit: 8; upperLimit: 10 } 
@@ -51,7 +60,8 @@ export type TProfile = {
   emailNotification: boolean;
   user_id: Types.ObjectId;
   workoutASetup?:Types.ObjectId;
-  lastJobNotificationDate?: Date | null; // Optional to align with schema
+  habits?: TUserHabits[]; // Optional to align with schema
+  favoriteFood?:Types.ObjectId[];
   notificationList_id?: Types.ObjectId; // Optional to align with schema
   isDeleted?: boolean;
 };

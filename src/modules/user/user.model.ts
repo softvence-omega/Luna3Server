@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import mongoose, { Schema } from 'mongoose';
-import { TProfile, TUser, TWorkoutASetup, TSleepQuality } from './user.interface';
+import { TProfile, TUser, TWorkoutASetup, TSleepQuality, TUserHabits } from './user.interface';
 import { userRole } from '../../constents';
 
 const SleepQualitySchema = new Schema<TSleepQuality>({
@@ -76,6 +76,31 @@ const UserSchema = new Schema<TUser>(
   { timestamps: true }
 );
 
+const UserHabitsSchema = new Schema<TUserHabits>({
+  habit_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref:"habitCollection"
+  },
+  isPusNotification: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  reminderTime: {
+    type: Date,
+    required: true,
+  },
+  reminderInterval: {
+    type: Number,
+    required: true,
+  },
+  reminderDays: {
+    type: [String],
+    required: true,
+  },
+});
+
 const ProfileSchema = new Schema<TProfile>(
   {
     name: { type: String, required: true },
@@ -97,7 +122,15 @@ const ProfileSchema = new Schema<TProfile>(
       required: false, 
       ref: 'WorkoutASetup' 
     },
-    lastJobNotificationDate: { type: Date, required: false, default: null }, // Made optional
+    habits:{
+      type:[UserHabitsSchema],
+      required:false
+    },
+    favoriteFood:{
+      type: [Schema.Types.ObjectId], 
+      required: false, 
+      ref: 'MealCollection' // Assuming you have a MealCollection model
+    },
     notificationList_id: { 
       type: Schema.Types.ObjectId, 
       required: false, 
