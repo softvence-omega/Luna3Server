@@ -69,5 +69,5 @@ const FoodSchema = new Schema<TFood>(
   );
   
   // Models
-  export const FoodModel = model<TFood>('Food', FoodSchema);
+  export const FoodModel = model<TFood>('FoodCollection', FoodSchema);
   export const UserConsumedFoodModel = model<TUserConsumedFood>('UserConsumedFood', UserConsumedFoodSchema);

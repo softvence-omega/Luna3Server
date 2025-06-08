@@ -10,7 +10,9 @@ async function main() {
   try {
     console.log("connecting to mongodb....⏳");
     await mongoose.connect(config.mongoose_uri);
+    console.log("mongo db connected successfully")
     await adminSeeder()
+    console.log("admin seeding done ===>><<+++")
     server = app.listen(config.port, () => {
       console.log(` LUNA3 app listening on port ${config.port}`);
     });

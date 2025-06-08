@@ -16,7 +16,7 @@ const adminSeeder = async () => {
   
   const adminExist = await UserModel.findOne({ role: userRole.admin });
 
-  // console.log(adminExist)
+  console.log(adminExist)
 
   if (!adminExist) {
     console.log('seeding admin....',admin);
@@ -26,7 +26,7 @@ const adminSeeder = async () => {
       throw Error('admin could not be created');
     }
 
-    console.log("✅ Create admin : ", createAdmin);
+    console.log("✅ Created admin : ", createAdmin);
   }else {
     console.log(`✅ Admin already exists: ${admin.name}`);
   }

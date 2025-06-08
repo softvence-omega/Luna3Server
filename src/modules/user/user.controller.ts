@@ -207,6 +207,49 @@ const getUserFullDetails = catchAsync(async (req, res) => {
   });
 });
 
+const createWorkoutSetup= catchAsync(async(req,res)=>{
+  const user_id = req.user.id
+  const convertedUserId  = idConverter(user_id)
+
+  if(!convertedUserId){
+    throw new Error ("user id convirsation failed")
+  }
+  const result = await userServices.createWorkoutSetup(convertedUserId,req.body)
+  res.status(200).json({
+    status: 'success',
+    message: 'Workout setup created successfully',
+    data: result,
+  })
+})
+const updateWorkoutSetup= catchAsync(async(req,res)=>{
+  const user_id = req.user.id
+  const convertedUserId  = idConverter(user_id)
+
+  if(!convertedUserId){
+    throw new Error ("user id convirsation failed")
+  }
+  const result = await userServices.updateWorkoutSetup(convertedUserId,req.body)
+  res.status(200).json({
+    status: 'success',
+    message: 'Workout setup updated successfully',
+    data: result,
+  })
+})
+const getWorkoutSetup= catchAsync(async(req,res)=>{
+  const user_id = req.user.id
+  const convertedUserId  = idConverter(user_id)
+
+  if(!convertedUserId){
+    throw new Error ("user id convirsation failed")
+  }
+  const result = await userServices.getWorkoutSetup(convertedUserId)
+  res.status(200).json({
+    status: 'success',
+    message: 'Workout setup updated successfully',
+    data: result,
+  })
+})
+
 
 const userController = {
   createUser,
@@ -220,8 +263,11 @@ const userController = {
   getAllProfiles,
   updateUserByAdmin,
   getUserFullDetails,
-  setFCMToken
+  setFCMToken,createWorkoutSetup,updateWorkoutSetup,getWorkoutSetup
 };
+
+
+
 
 
 export default userController;

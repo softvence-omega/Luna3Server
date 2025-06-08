@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import mongoose, { Schema } from 'mongoose';
-import { TProfile, TUser, TWorkoutASetup, TSleepQuality, TUserHabits } from './user.interface';
+import mongoose, { Schema, Types } from 'mongoose';
+import { TProfile, TUser, TWorkoutASetup, TSleepQuality } from './user.interface';
 import { userRole } from '../../constents';
 
 const SleepQualitySchema = new Schema<TSleepQuality>({
@@ -25,7 +25,8 @@ const WorkoutASetupSchema = new Schema<TWorkoutASetup>({
   user_id: { 
     type: Schema.Types.ObjectId, 
     required: true, 
-    ref: 'UserCollection' 
+    ref: 'UserCollection',
+    unique:true 
   },
   goal: { 
     type: String, 
@@ -76,30 +77,7 @@ const UserSchema = new Schema<TUser>(
   { timestamps: true }
 );
 
-const UserHabitsSchema = new Schema<TUserHabits>({
-  habit_id: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref:"habitCollection"
-  },
-  isPusNotification: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  reminderTime: {
-    type: Date,
-    required: true,
-  },
-  reminderInterval: {
-    type: Number,
-    required: true,
-  },
-  reminderDays: {
-    type: [String],
-    required: true,
-  },
-});
+
 
 const ProfileSchema = new Schema<TProfile>(
   {
@@ -111,7 +89,7 @@ const ProfileSchema = new Schema<TProfile>(
       required: false, 
       default: "https://res.cloudinary.com/dpgcpei5u/image/upload/v1747546759/interviewProfile_jvo9jl.jpg" 
     },
-    emailNotification: { type: Boolean, required: true, default: false },
+    emailNotification: { type: Boolean, required: false, default: false },
     user_id: { 
       type: Schema.Types.ObjectId, 
       required: true, 
@@ -123,13 +101,13 @@ const ProfileSchema = new Schema<TProfile>(
       ref: 'WorkoutASetup' 
     },
     habits:{
-      type:[UserHabitsSchema],
+      type:[Types.ObjectId],
       required:false
     },
     favoriteFood:{
       type: [Schema.Types.ObjectId], 
       required: false, 
-      ref: 'MealCollection' // Assuming you have a MealCollection model
+      ref: 'FoodCollection' // Assuming you have a MealCollection model
     },
     notificationList_id: { 
       type: Schema.Types.ObjectId, 
