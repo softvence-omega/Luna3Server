@@ -1,10 +1,10 @@
 import mongoose, { Types } from 'mongoose';
-import { TExercise } from './exercise.interface';
+import { TExercise, UserExercisePerform } from './exercise.interface';
 import {
   deleteFile,
   uploadImgToCloudinary,
 } from '../../util/uploadImgToCludinary';
-import { ExerciseModel } from './exercise.model';
+import { ExerciseModel, UserExercisePerformModel } from './exercise.model';
 import { EXERCISE_TYPES } from '../../constents';
 
 const createCommonExercise = async (
@@ -166,13 +166,86 @@ const getExerciseById = async (exercise_id: Types.ObjectId) => {
 
 //user exercise perform
 
+const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExercisePerform>) => {
+    // Validate user_id
+    if (!Types.ObjectId.isValid(user_id)) {
+      throw new Error('Invalid user ID.');
+    }
+  
+    // Validate required payload fields
+    if (!payLoad.exercise_id || payLoad.set == null || payLoad.reps == null || payLoad.restTime == null) {
+      throw new Error('exercise_id, set, reps, and restTime are required.');
+    }
+  
+    // Validate exercise_id
+    if (!Types.ObjectId.isValid(payLoad.exercise_id)) {
+      throw new Error('Invalid exercise ID.');
+    }
+  
+    // Check MongoDB connection
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB connection is not ready.');
+    }
+  
+    try {
+      // Find exercise
+      const findExercise = await ExerciseModel.findOne({ _id: payLoad.exercise_id }).lean();
+      if (!findExercise) {
+        throw new Error('Exercise not found.');
+      }
+  
+      // Validate weightLifted based on exerciseType
+      let validatedWeightLifted: number = payLoad.weightLifted ?? 0;
+  
+      if (findExercise.exerciseType === EXERCISE_TYPES.weight_training) {
+        if (validatedWeightLifted <= 0) {
+          throw new Error('weightLifted is required and must be a positive number for weight_training.');
+        }
+      } else if (
+        findExercise.exerciseType === EXERCISE_TYPES.bodyweight_exercises ||
+        findExercise.exerciseType === EXERCISE_TYPES.high_Intensity ||
+        findExercise.exerciseType === EXERCISE_TYPES.strength_Training
+      ) {
+        // weightLifted is optional; keep as is (number or 0)
+      } else {
+        // For cardio, stretching, balance_Training, set weightLifted to 0
+        validatedWeightLifted = 0;
+      }
+  
+      // Prepare data to save
+      const exercisePerformData = {
+        exercise_id: payLoad.exercise_id,
+        user_id,
+        set: payLoad.set,
+        weightLifted: validatedWeightLifted,
+        reps: payLoad.reps,
+        restTime: payLoad.restTime,
+        isCompleted: false,
+      };
+  
+      // Save to UserExercisePerformModel
+      const savedExercisePerform = await UserExercisePerformModel.create(exercisePerformData);
+  
+      return savedExercisePerform;
+    } catch (error: any) {
+      console.error('Error creating user exercise perform:', error);
+      throw new Error(error.message || 'Failed to create user exercise perform.');
+    }
+  };
 
+
+const markExerciseAsCompleated = async (user_id:Types.ObjectId, Performed_exercise_id:Types.ObjectId)=>{
+    const markAsDone = await UserExercisePerformModel.findOneAndUpdate({_id:Performed_exercise_id, user_id:user_id},{isCompleted:true},{new:true})
+    //call ai for calory burn count and then update the totalCalory Burn
+    return markAsDone
+}
 
 
 const exerciseServicves = {
   createCommonExercise,
   createPersonalizeExercise,
   getExerciseBothCommonAndPersonalize,
-  getExerciseById
+  getExerciseById,
+  performExercise
 };
 export default exerciseServicves;

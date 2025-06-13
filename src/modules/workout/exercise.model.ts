@@ -48,7 +48,8 @@ const ExerciseSchema = new Schema<TExercise>({
     },
     weightLifted: {
       type: Number,
-      required: true,
+      required: false,
+      default:0
     },
     reps: {
       type: Number,
@@ -63,7 +64,13 @@ const ExerciseSchema = new Schema<TExercise>({
       required: true,
       default: false,
     },
-  });
+    totalCaloryBurn: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+  },
+{timestamps:true});
   
   // Models
   export const ExerciseModel = model<TExercise>('Exercise', ExerciseSchema);

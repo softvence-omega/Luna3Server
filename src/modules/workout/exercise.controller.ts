@@ -26,7 +26,6 @@ const createCommonExercise = catchAsync(async(req, res)=>{
  })
 })
 
-
 const createPersonalizeExercise = catchAsync(async(req, res)=>{
     const user_id = req.user.id
     const convertedUserId= idConverter(user_id)
@@ -52,6 +51,8 @@ const createPersonalizeExercise = catchAsync(async(req, res)=>{
     data:result
  })
 })
+
+
 
 const exerciseController = {
     createCommonExercise,createPersonalizeExercise
