@@ -132,8 +132,6 @@ const createUser = async (payload: Partial<TUser>, method?: string) => {
   }
 };
 
-
-
 const setFCMToken = async (user_id: Types.ObjectId, fcmToken: string) => {
   if (!fcmToken) {
     throw new Error('fcm token is required');

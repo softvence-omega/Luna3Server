@@ -42,11 +42,11 @@ const getHabit= catchAsync(async(req,res)=>{
 })
 
 
-const addHabitToLife= catchAsync(async(req,res )=>{
+const addHabitToUser= catchAsync(async(req,res )=>{
 const userId= req.user.id
 const convertedUserid = idConverter(userId)
 
-const result = await habitServices.addHabitToLife(convertedUserid as Types.ObjectId, req.body)
+const result = await habitServices.addHabitToUser(convertedUserid as Types.ObjectId, req.body)
 res.status(200).json({
     status: 'success',
     message: 'Habit added to life successfully',
@@ -69,7 +69,21 @@ res.status(200).json({
 });
 })
 
+
+const getUserHabits= catchAsync(async(req,res )=>{
+const userId= req.user.id
+const convertedUserid = idConverter(userId)
+
+
+const result = await habitServices.getUserHabits(convertedUserid as Types.ObjectId)
+res.status(200).json({
+    status: 'success',
+    message: 'Habit added to life successfully',
+    data: result,
+});
+})
+
 const habitController ={
-    createHabit,getHabit,addHabitToLife,updateUserHabit
+    createHabit,getHabit,addHabitToUser,updateUserHabit,getUserHabits
 }
 export default habitController

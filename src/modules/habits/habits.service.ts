@@ -84,7 +84,7 @@ const getHabit = async () => {
   return result;
 };
 
-const addHabitToLife = async (user_id:Types.ObjectId, payLoad:any) => {
+const addHabitToUser = async (user_id:Types.ObjectId, payLoad:any) => {
     // Validate inputs
     if (!user_id) {
       throw new Error('Adding habit to life failed: No user ID provided.');
@@ -143,7 +143,7 @@ const addHabitToLife = async (user_id:Types.ObjectId, payLoad:any) => {
       };
     } catch (error:any) {
       await session.abortTransaction();
-      console.error('Error in addHabitToLife:', {
+      console.error('Error in addHabitToUser:', {
         message: error.message,
         stack: error.stack,
         error,
@@ -223,11 +223,17 @@ const updateUserHabit = async (user_id:Types.ObjectId, habit_id:Types.ObjectId, 
     }
   };
 
+const getUserHabits = async (user_id:Types.ObjectId)=>{
+const result = await UserHabitsModel.find({user_id:user_id})
+return result 
+}
+
 const habitServices = {
   createHabit,
   getHabit,
-  addHabitToLife,
-  updateUserHabit
+  addHabitToUser,
+  updateUserHabit,
+  getUserHabits
 };
 
 export default habitServices;

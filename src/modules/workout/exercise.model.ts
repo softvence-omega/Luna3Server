@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { TExercise, TUserExercise } from "./exercise.interface";
+import { TExercise, UserExercisePerform,  } from "./exercise.interface";
 
 
 const ExerciseSchema = new Schema<TExercise>({
@@ -10,6 +10,7 @@ const ExerciseSchema = new Schema<TExercise>({
     user_id: {
       type: Schema.Types.ObjectId,
       required: false,
+      default:null
     },
     name: {
       type: String,
@@ -25,12 +26,13 @@ const ExerciseSchema = new Schema<TExercise>({
     },
     exerciseType: {
       type: String,
-      enum: ['cardio', 'strength_Training', 'stretching', 'balance_Training', 'high_Intensity', 'weight_lifting', 'bodyweight_exercises'],
+      enum: ['cardio', 'strength_Training', 'stretching', 'balance_Training', 'high_Intensity', 'weight_training', 'bodyweight_exercises'],
       required: true,
     },
   });
-  
-  const UserExerciseSchema = new Schema<TUserExercise>({
+
+
+  const UserExercisePerformSchema = new Schema<UserExercisePerform>({
     exercise_id: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -65,4 +67,4 @@ const ExerciseSchema = new Schema<TExercise>({
   
   // Models
   export const ExerciseModel = model<TExercise>('Exercise', ExerciseSchema);
-  export const UserExerciseModel = model<TUserExercise>('UserExercise', UserExerciseSchema);
+  export const UserExercisePerformModel = model<UserExercisePerform>('UserExercisePerformModel', UserExercisePerformSchema);

@@ -221,6 +221,7 @@ const createWorkoutSetup= catchAsync(async(req,res)=>{
     data: result,
   })
 })
+
 const updateWorkoutSetup= catchAsync(async(req,res)=>{
   const user_id = req.user.id
   const convertedUserId  = idConverter(user_id)
@@ -235,6 +236,7 @@ const updateWorkoutSetup= catchAsync(async(req,res)=>{
     data: result,
   })
 })
+
 const getWorkoutSetup= catchAsync(async(req,res)=>{
   const user_id = req.user.id
   const convertedUserId  = idConverter(user_id)
