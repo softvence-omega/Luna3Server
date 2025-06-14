@@ -12,13 +12,15 @@ const createCommonExercise = async (
   payload: Partial<TExercise>,
   user_id?: Types.ObjectId,
 ) => {
+
+  console.log("blueeeee", payload)
   // Validate inputs
   if (
     !payload ||
     !payload.name ||
     !payload.description ||
-    payload.primaryMuscleGroup ||
-    payload.exerciseType
+    !payload.primaryMuscleGroup ||
+    !payload.exerciseType
   ) {
     throw new Error('Exercise name and description are required.');
   }
@@ -246,6 +248,7 @@ const exerciseServicves = {
   createPersonalizeExercise,
   getExerciseBothCommonAndPersonalize,
   getExerciseById,
-  performExercise
+  performExercise,
+  markExerciseAsCompleated
 };
 export default exerciseServicves;
