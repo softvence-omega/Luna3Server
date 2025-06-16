@@ -20,6 +20,12 @@ export type TFood={
 export type TUserConsumedFood={
     user_id:Types.ObjectId;
     consumedAs:"breakfast"|"lunch"|"dinner"|"snack";
-    food_id:Types.ObjectId;
+    nutritionPerServing:{
+        calories:number;
+        protein:number;
+        carbs:number;
+        fats:number;
+        fiber:number;
+    }
     servings:number;
 }

@@ -29,15 +29,15 @@ const FoodSchema = new Schema<TFood>(
       },
       preparationTime: {
         type: Number,
-        required: true,
+        required: false,
       },
       nutritionPerServing: {
         type: {
-          calories: { type: Number, required: true },
-          protein: { type: Number, required: true },
-          carbs: { type: Number, required: true },
-          fats: { type: Number, required: true },
-          fiber: { type: Number, required: true },
+          calories: { type: Number, required: true, default:0 },
+          protein: { type: Number, required: true, default:0 },
+          carbs: { type: Number, required: true, default:0 },
+          fats: { type: Number, required: true, default:0 },
+          fiber: { type: Number, required: true, default:0 },
         },
         required: true,
       },
@@ -56,8 +56,14 @@ const FoodSchema = new Schema<TFood>(
         enum: ['breakfast', 'lunch', 'dinner', 'snack'],
         required: true,
       },
-      food_id: {
-        type: Schema.Types.ObjectId,
+      nutritionPerServing: {
+        type: {
+          calories: { type: Number, required: true, default:0 },
+          protein: { type: Number, required: true, default:0 },
+          carbs: { type: Number, required: true, default:0 },
+          fats: { type: Number, required: true, default:0 },
+          fiber: { type: Number, required: true, default:0 },
+        },
         required: true,
       },
       servings: {

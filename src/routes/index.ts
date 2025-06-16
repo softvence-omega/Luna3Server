@@ -3,6 +3,7 @@ import authRouter from '../modules/auth/auth.routes';
 import userRoutes from '../modules/user/user.routes';
 import habitRoutes from '../modules/habits/habiits.routes';
 import exerciseRoutes from '../modules/workout/exercise.routes';
+import foodRoutes from '../modules/foodLooging/food.route';
 
 const Routes = express.Router();
 // Array of module routes
@@ -22,6 +23,10 @@ const moduleRouts = [
   {
     path: '/exercise',
     router:exerciseRoutes,
+  },
+  {
+    path: '/foods',
+    router:foodRoutes,
   }
 ];
 
