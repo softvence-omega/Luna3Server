@@ -1,31 +1,35 @@
-import express from "express"
-import auth from "../../middleware/auth";
-import { userRole } from "../../constents";
-import { upload } from "../../util/uploadImgToCludinary";
-import foodLoaderController from "./food.controller";
-const foodRoutes = express.Router()
-
-
-foodRoutes.post(
-    '/addFoodManually',
-    auth([userRole.admin]),
-    upload.single('file'),
-    foodLoaderController.addFoodManually
-  );
+import express from 'express';
+import auth from '../../middleware/auth';
+import { userRole } from '../../constents';
+import { upload } from '../../util/uploadImgToCludinary';
+import foodLoaderController from './food.controller';
+const foodRoutes = express.Router();
 
 foodRoutes.post(
-    '/addPersonalizeFoodManually',
-    auth([userRole.admin, userRole.user]),
-    upload.single('file'),
-    foodLoaderController.addPersonalizeFoodManually
-  );
+  '/addFoodManually',
+  auth([userRole.admin]),
+  upload.single('file'),
+  foodLoaderController.addFoodManually,
+);
 
 foodRoutes.post(
-    '/addConsumedFoodFromImgOrQRCodeOrFoodId',
-    auth([userRole.admin, userRole.user]),
-    upload.single('file'),
-    foodLoaderController.addConsumedFoodFromImgOrQRCodeOrFoodId
-  );
+  '/addPersonalizeFoodManually',
+  auth([userRole.admin, userRole.user]),
+  upload.single('file'),
+  foodLoaderController.addPersonalizeFoodManually,
+);
 
+foodRoutes.post(
+  '/addConsumedFoodFromImgOrQRCodeOrFoodId',
+  auth([userRole.admin, userRole.user]),
+  upload.single('file'),
+  foodLoaderController.addConsumedFoodFromImgOrQRCodeOrFoodId,
+);
 
-export default foodRoutes
+foodRoutes.get(
+  '/getAllFood',
+  auth([userRole.admin, userRole.user]),
+  foodLoaderController.getAllFood,
+);
+
+export default foodRoutes;

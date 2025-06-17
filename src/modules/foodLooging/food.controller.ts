@@ -93,10 +93,24 @@ const addConsumedFoodFromImgOrQRCodeOrFoodId = catchAsync(async (req, res) => {
   });
 });
 
+
+const getAllFood = catchAsync(async(req,res)=>{
+  const user_id = req.user.id as string
+  const convertedId = idConverter(user_id) as Types.ObjectId
+
+  const result = await foodLoadingServices.getAllFood(convertedId)
+
+  res.status(200).json({
+    status: 'success',
+    message: 'personalize and common both Food found successfully',
+    data: result,
+  });
+})
+
 const foodLoaderController = {
   addFoodManually,
   addPersonalizeFoodManually,
-  addConsumedFoodFromImgOrQRCodeOrFoodId,
+  addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood
 };
 
 export default foodLoaderController;
