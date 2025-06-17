@@ -11,12 +11,12 @@ const SleepQualitySchema = new Schema<TSleepQuality>({
   },
   lowerLimit: { 
     type: Number, 
-    enum: [8, 7, 3, 0], 
+    enum: [1,2,3,4,5,6,9,8, 7, 3, 0], 
     required: true 
   },
   upperLimit: { 
     type: Number, 
-    enum: [10, 8, 4, 2], 
+    enum: [1,2,3,4,5,6,9,8, 7, 3, 0], 
     required: true 
   }
 });

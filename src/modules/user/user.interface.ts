@@ -30,8 +30,8 @@ export type TUser = {
 export type TSleepQuality =
   | { quality: 'excellent'; lowerLimit: 8; upperLimit: 10 } 
   | { quality: 'great'; lowerLimit: 7; upperLimit: 8 }
-  | { quality: 'normal'; lowerLimit: 3; upperLimit: 4 }
-  | { quality: 'bad'; lowerLimit: 0; upperLimit: 2 };
+  | { quality: 'normal'; lowerLimit: 5; upperLimit: 6 }
+  | { quality: 'bad'; lowerLimit: 0; upperLimit: 4 };
 
 export type TWorkoutASetup = {
   user_id:Types.ObjectId;
