@@ -4,6 +4,7 @@ import userRoutes from '../modules/user/user.routes';
 import habitRoutes from '../modules/habits/habiits.routes';
 import exerciseRoutes from '../modules/workout/exercise.routes';
 import foodRoutes from '../modules/foodLooging/food.route';
+import barbellRoutes from '../modules/barbellLLM/barbel.routes';
 
 const Routes = express.Router();
 // Array of module routes
@@ -27,6 +28,10 @@ const moduleRouts = [
   {
     path: '/foods',
     router:foodRoutes,
+  },
+  {
+    path: '/barbelLLM',
+    router:barbellRoutes,
   }
 ];
 
