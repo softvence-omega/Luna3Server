@@ -113,6 +113,22 @@ const getWorkoutRoutine = async(user_id:Types.ObjectId)=>{
     return result
 }
 
-const barbelLLMServices = { createExerciseRoutine,saveWorkOutPlan,getWorkoutRoutine };
+const updateExerciseRoutine = async(user_id:Types.ObjectId, feedBack:String)=>{
+const findExistingWorkoutPlan = await ExercisePlanModel.findOne({user_id:user_id})
+if(!findExistingWorkoutPlan)
+{
+  throw Error("findExistingWorkoutPlan is not found")
+}
+const updateExerciseRoutinePayload={
+  original_plan:findExistingWorkoutPlan.workout_plan.plan,
+  feedback:feedBack
+} 
+
+
+
+
+}
+
+const barbelLLMServices = { createExerciseRoutine,saveWorkOutPlan,getWorkoutRoutine,updateExerciseRoutine };
 
 export default barbelLLMServices;

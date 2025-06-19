@@ -37,7 +37,7 @@ const getWorkoutRoutine =catchAsync(async(req,res)=>{
     const convertedId = idConverter(user_id)as Types.ObjectId
     
 
-    const result  = await barbelLLMServices.getWorkoutRoutine(user_id)
+    const result  = await barbelLLMServices.getWorkoutRoutine(convertedId)
 
     res.status(200).json({
         success:true,
@@ -46,8 +46,23 @@ const getWorkoutRoutine =catchAsync(async(req,res)=>{
     })
 })
 
+const updateExerciseRoutine =catchAsync(async(req,res)=>{
+    const user_id = req.user.id
+    const convertedId = idConverter(user_id)as Types.ObjectId
+    const feedBack = req.body
+    
+
+    const result  = await barbelLLMServices.updateExerciseRoutine(convertedId,feedBack)
+
+    res.status(200).json({
+        success:true,
+        message:"work out routine is updated",
+        data:result
+    })
+})
+
 const barbellController= {
-    createExerciseRoutine,saveWorkOutPlan,getWorkoutRoutine
+    createExerciseRoutine,saveWorkOutPlan,getWorkoutRoutine,updateExerciseRoutine
 }
 
 export default barbellController
