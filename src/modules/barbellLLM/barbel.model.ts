@@ -36,6 +36,42 @@ const exerciseSchema = new Schema<TExercise>(
     },
     { timestamps: true } // Adds createdAt, updatedAt
   );
-  
+
+
+// Define the TEachChat schema
+const TEachChatSchema = new Schema({
+  response_id: {
+    type: String,
+    required: false,
+  },
+  user_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
+  user_feedback: {
+    type: String,
+    required: true,
+  },
+  ai_response: {
+    type: String,
+    required: true,
+  },
+});
+
+// Define the TUserChatList schema
+const TUserChatListSchema = new Schema({
+  user_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    unique: true, // Ensures one chat list per user
+  },
+  chatList: {
+    type: [TEachChatSchema],
+    default: [],
+  },
+});
+
+// Create and export the model
+export const UserChatListModel = model('TUserChatList', TUserChatListSchema);
   // Mongoose model
  export  const ExercisePlanModel = model<TExercisePlan>('ExercisePlan', exercisePlanSchema);

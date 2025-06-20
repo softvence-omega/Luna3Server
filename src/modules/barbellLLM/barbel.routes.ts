@@ -10,9 +10,13 @@ const barbellRoutes = express.Router()
 barbellRoutes.post("/createExerciseRoutine", auth([userRole.admin, userRole.user]),barbellController.createExerciseRoutine )
 barbellRoutes.post("/saveWorkOutPlan", auth([userRole.admin, userRole.user]),barbellController.saveWorkOutPlan )
 barbellRoutes.get("/getWorkoutRoutine", auth([userRole.admin, userRole.user]),barbellController.getWorkoutRoutine )
-barbellRoutes.get("/updateExerciseRoutine", auth([userRole.admin, userRole.user]),barbellController.updateExerciseRoutine )
+barbellRoutes.post("/updateExerciseRoutine", auth([userRole.admin, userRole.user]),barbellController.updateExerciseRoutine )
 
 //workout Part ends here
+
+// chat part 
+
+
 
 
 export default barbellRoutes
