@@ -11,6 +11,6 @@ habitRoutes.get("/getHabit", habitController.getHabit)
 
 habitRoutes.post("/addHabitToUser",auth([userRole.admin, userRole.user]), habitController.addHabitToUser)
 habitRoutes.post("/updateUserHabit",auth([userRole.admin, userRole.user]), habitController.updateUserHabit)
-habitRoutes.post("/getUserHabits",auth([userRole.admin, userRole.user]), habitController.getUserHabits)
+habitRoutes.get("/getUserHabits",auth([userRole.admin, userRole.user]), habitController.getUserHabits)
 
 export default habitRoutes

@@ -21,3 +21,22 @@ export type TExercise = {
     user_id:Types.ObjectId;
     workout_plan: TWorkoutPlan;
   };
+
+
+  export type TEachChat=
+    {
+      response_id?: string,
+      user_id: string,
+      user_feedback: "string",
+      ai_response:string,
+      timestamp:string
+      status:string,
+      session_id:string
+
+    }
+  
+
+  export type TUserChatList = {
+    user_id:Types.ObjectId,
+    chatList:[TEachChat]
+  }

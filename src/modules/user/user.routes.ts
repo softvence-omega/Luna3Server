@@ -7,7 +7,7 @@ import auth from "../../middleware/auth"
 const userRoutes = express.Router()
 
 // users roiuts
-userRoutes.post("/createUser", userController.createUser);
+userRoutes.post("/createUser",upload.single("file"), userController.createUser);
 userRoutes.post("/setFCMToken", auth([userRole.admin, userRole.user]),userController.setFCMToken)
 userRoutes.patch("/updateProfileData", auth([userRole.admin, userRole.user]), userController.updateProfileData);
 userRoutes.delete("/selfDistuct", auth([userRole.user]), userController.selfDistuct);
