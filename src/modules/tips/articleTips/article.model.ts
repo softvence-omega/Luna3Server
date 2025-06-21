@@ -1,11 +1,11 @@
 import { Schema, model } from 'mongoose';
-import { TTip } from './tips.interface';
+import { TTipArticle } from './article.interface';
 
-const TipSchema = new Schema<TTip>(
+const TipSchema = new Schema<TTipArticle>(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    video: { type: String },
+    image: { type: String },
     tag: [{ type: String }],
     favCount: { type: Number, default: 0 },
     userId: { type: String, required: true },
@@ -13,4 +13,4 @@ const TipSchema = new Schema<TTip>(
   { timestamps: true }
 );
 
-export const TipModel = model<TTip>('Tip', TipSchema);
+export const TipArticleModel = model<TTipArticle>('TipArticle', TipSchema);

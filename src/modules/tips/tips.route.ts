@@ -1,13 +1,21 @@
 import express from 'express';
 import { uploadVideo } from '../../util/uploadVideoToCloudinary';
 import { TipController } from './tips.controller';
+import auth from '../../middleware/auth';
+import { userRole } from '../../constents';
 
-const router = express.Router();
+const tipsRoute = express.Router();
 
-router.post('/', uploadVideo.single('video'), TipController.createTip);
-router.get('/', TipController.getAllTips);
-router.get('/:id', TipController.getTip);
-router.put('/:id', TipController.updateTip);
-router.delete('/:id', TipController.deleteTip);
+tipsRoute.post('/create-tips', auth([userRole.admin, userRole.user]), uploadVideo.single('video'), TipController.createTip);
 
-export default router;
+tipsRoute.get('/all-tips', TipController.getAllTips);
+
+tipsRoute.get('/single-tip/:id', TipController.getTip);
+
+tipsRoute.get('/my-tips', auth([userRole.admin, userRole.user]), TipController.getMyTips);
+
+tipsRoute.put('/update-tip/:id', auth([userRole.admin, userRole.user]),uploadVideo.single('video'), TipController.updateTip);
+
+tipsRoute.delete('/delete-tip/:id', auth([userRole.admin, userRole.user]), TipController.deleteTip);
+
+export default tipsRoute;
