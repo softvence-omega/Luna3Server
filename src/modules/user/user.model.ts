@@ -57,8 +57,9 @@ const WorkoutASetupSchema = new Schema<TWorkoutASetup>({
 
 const UserSchema = new Schema<TUser>(
   {
+    img:{ type: String, required: true },
     name: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: false },
     email: { type: String, required: true },
     password: { type: String, required: true },
     confirmPassword: { type: String, required: false },
@@ -82,7 +83,7 @@ const UserSchema = new Schema<TUser>(
 const ProfileSchema = new Schema<TProfile>(
   {
     name: { type: String, required: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: false },
     email: { type: String, required: true },
     img: { 
       type: String, 

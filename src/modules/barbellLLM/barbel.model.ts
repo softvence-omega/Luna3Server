@@ -45,7 +45,7 @@ const TEachChatSchema = new Schema({
     required: false,
   },
   user_id: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
   },
   user_feedback: {
@@ -56,6 +56,19 @@ const TEachChatSchema = new Schema({
     type: String,
     required: true,
   },
+  timestamp:{
+    type:String,
+    require:false
+  },
+  status:{
+    type:String,
+    require:false
+  },
+  session_id:{
+    type:String,
+    require:false
+  },
+
 });
 
 // Define the TUserChatList schema

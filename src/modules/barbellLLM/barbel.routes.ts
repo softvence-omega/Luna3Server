@@ -16,6 +16,10 @@ barbellRoutes.post("/updateExerciseRoutine", auth([userRole.admin, userRole.user
 
 // chat part 
 
+barbellRoutes.post("/startChatOrGetPreviousChat", auth([userRole.admin, userRole.user]),barbellController.startChatOrGetPreviousChat )
+barbellRoutes.post("/endChat", auth([userRole.admin, userRole.user]),barbellController.endChat )
+barbellRoutes.post("/sendMessageAndGetReply", auth([userRole.admin, userRole.user]),barbellController.sendMessageAndGetReply )
+
 
 
 

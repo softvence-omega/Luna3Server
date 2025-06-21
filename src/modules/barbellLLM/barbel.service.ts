@@ -193,16 +193,107 @@ const updateExerciseRoutine = async (
 
 
 //chat action 
-const startChat = async (user_id:Types.ObjectId)=>{
-  const userChatList = await UserChatListModel.create({user_id:user_id})
-  return userChatList
+const startChatOrGetPreviousChat = async (user_id:Types.ObjectId)=>{
+  const findChatList = await UserChatListModel.findOne({user_id:user_id})
+  if(!findChatList)
+  {
+    const userChatList = await UserChatListModel.create({user_id:user_id})
+    return userChatList
+  }
+  else
+  {
+    return findChatList
+  }
+  
 }
+const endChat = async (user_id:Types.ObjectId)=>{
+  const findChatList = await UserChatListModel.findOne({user_id:user_id})
+  if(findChatList)
+  {
+    const userChatList = await UserChatListModel.deleteOne({user_id:user_id})
+    return userChatList
+  }
+  else
+  {
+    throw Error ("nko chat list is found to delete")
+  }
+  
+}
+
+const sendMessageAndGetReply = async (user_id: Types.ObjectId, message: string) => {
+  const session_id = user_id.toString();
+  if (!user_id || !message || !session_id) {
+    throw new Error("user_id, message, or session_id not provided");
+  }
+
+  const aiWorkoutPlanEndPoint = 'generate-response';
+  const fullAiApi = `${config.AI_BASE_URL}${aiWorkoutPlanEndPoint}`;
+
+  try {
+    const response = await fetch(fullAiApi, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: user_id.toString(),
+        user_feedback: message,
+        session_id,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 422) {
+        const errorData = await response.json();
+        throw new Error(`Validation Error: ${JSON.stringify(errorData.detail)}`);
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Save the response to the database
+    await UserChatListModel.findOneAndUpdate(
+      { user_id: user_id },
+      {
+        $push: {
+          chatList: {
+            response_id: data.response_id,
+            user_id: data.user_id,
+            user_feedback: data.user_feedback,
+            ai_response: data.ai_response,
+            timestamp: data.timestamp,
+            status: data.status,
+            session_id: data.session_id,
+          },
+        },
+      },
+      { new: true, upsert: true } // Return updated document and create if not exists
+    );
+
+    return {
+      response_id: data.response_id,
+      user_id: data.user_id,
+      user_feedback: data.user_feedback,
+      ai_response: data.ai_response,
+      timestamp: data.timestamp,
+      status: data.status,
+      session_id: data.session_id,
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to fetch AI response: ${error.message}`);
+  }
+};
 
 const barbelLLMServices = {
   createExerciseRoutine,
   saveWorkOutPlan,
   getWorkoutRoutine,
   updateExerciseRoutine,
+  startChatOrGetPreviousChat,
+  endChat,
+  sendMessageAndGetReply
 };
 
 export default barbelLLMServices;

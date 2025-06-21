@@ -7,8 +7,9 @@ export type TUserRole = 'admin' | 'user';
 export type TInterviewsAvailable = number | 'unlimited';
 
 export type TUser = {
+  img:string,
   name: string;
-  phone: string;
+  phone?: string;
   email: string;
   password: string;
   confirmPassword?: string;
@@ -48,7 +49,7 @@ export type TWorkoutASetup = {
 
 export type TProfile = {
   name: string;
-  phone: string;
+  phone?: string;
   email: string;
   img?: string;
   emailNotification: boolean;

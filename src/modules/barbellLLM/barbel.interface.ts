@@ -26,9 +26,13 @@ export type TExercise = {
   export type TEachChat=
     {
       response_id?: string,
-      user_id: Types.ObjectId,
+      user_id: string,
       user_feedback: "string",
       ai_response:string,
+      timestamp:string
+      status:string,
+      session_id:string
+
     }
   
 
