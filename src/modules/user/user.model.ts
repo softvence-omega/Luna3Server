@@ -73,7 +73,7 @@ const UserSchema = new Schema<TUser>(
     isLoggedIn: { type: Boolean, required: false, default: false },
     loggedOutTime: { type: Date, required: false },
     passwordChangeTime: { type: Date, required: false },
-    fcmToken: { type: String, required: false },
+    fcmToken: { type: String, required: false, default: null },
   },
   { timestamps: true }
 );
