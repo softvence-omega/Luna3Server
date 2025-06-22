@@ -1,17 +1,14 @@
 import { Types } from 'mongoose';
-import {
-  NotificationListModel,
-  NotificationModel,
-} from './notification.model';
+import { NotificationListModel, NotificationModel } from './notification.model';
 import { ProfileModel } from '../user/user.model';
 import { sendSingleNotification } from '../../firebaseSetup/sendPushNotification';
 
-const getNotificationForNotificationBell = async(user_id: Types.ObjectId)=>{
-  const result = await NotificationListModel.findOne(
-    { user_id: user_id },
-  ).select('newNotification seenNotificationCount oldNotificationCount');
+const getNotificationForNotificationBell = async (user_id: Types.ObjectId) => {
+  const result = await NotificationListModel.findOne({
+    user_id: user_id,
+  }).select('newNotification seenNotificationCount oldNotificationCount');
   return result;
-}
+};
 
 const getAllNotifications = async (user_id: Types.ObjectId) => {
   // Automatically update the notification counts and retrieve the updated document
@@ -91,7 +88,7 @@ const sendNotificationFromAdmin = async (payload: {
       }
 
       // 1. Upsert NotificationList
-    //   const notificationList = 
+      //   const notificationList =
       await NotificationListModel.findOneAndUpdate(
         { user_id: profile.user_id },
         {
@@ -131,7 +128,11 @@ const sendNotificationFromAdmin = async (payload: {
       );
 
       // Send push notification
-      await sendSingleNotification(profile.user_id, 'Admin Notification', notificationMessage);
+      await sendSingleNotification(
+        profile.user_id,
+        'Admin Notification',
+        notificationMessage,
+      );
     }
 
     return {
@@ -177,7 +178,7 @@ const notificationServices = {
   viewSpecificNotification,
   sendNotificationFromAdmin,
   getAllNotificationForAdmin,
-  getNotificationForNotificationBell
+  getNotificationForNotificationBell,
 };
 
 export default notificationServices;

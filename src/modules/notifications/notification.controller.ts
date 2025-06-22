@@ -1,83 +1,86 @@
-import { Types } from "mongoose";
-import catchAsync from "../../util/catchAsync";
-import golbalRespnseHandler from "../../util/globalResponseHandeler";
-import idConverter from "../../util/idConvirter";
-import notificationServices from "./notification.service";
+import { Types } from 'mongoose';
+import catchAsync from '../../util/catchAsync';
+import golbalRespnseHandler from '../../util/globalResponseHandeler';
+import idConverter from '../../util/idConvirter';
+import notificationServices from './notification.service';
 
-const getNotificationForNotificationBell= catchAsync(async(req,res)=>{
-    const user_id = req.user.id
-    const converted_user_id= idConverter(user_id)
+const getNotificationForNotificationBell = catchAsync(async (req, res) => {
+  const user_id = req.user.id;
+  const converted_user_id = idConverter(user_id);
 
-    const result = await notificationServices.getNotificationForNotificationBell(converted_user_id as Types.ObjectId)
-    golbalRespnseHandler(res, {
-        statusCode: 200,
-        success: true,
-        message: 'Notification for bell',
-        data: result,
-      });
-})
+  const result = await notificationServices.getNotificationForNotificationBell(
+    converted_user_id as Types.ObjectId,
+  );
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Notification for bell',
+    data: result,
+  });
+});
 
+const getAllNotifications = catchAsync(async (req, res) => {
+  const user_id = req.user.id;
+  const converted_user_id = idConverter(user_id);
 
-const getAllNotifications = catchAsync(async(req, res)=>{
+  const result = await notificationServices.getAllNotifications(
+    converted_user_id as Types.ObjectId,
+  );
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'All Notification',
+    data: result,
+  });
+});
 
-    const user_id = req.user.id
-    const converted_user_id= idConverter(user_id)
+const viewSpecificNotification = catchAsync(async (req, res) => {
+  const user_id = req.user.id;
+  const converted_user_id = idConverter(user_id);
 
-    const result = await notificationServices.getAllNotifications(converted_user_id as Types.ObjectId)
-    golbalRespnseHandler(res, {
-        statusCode: 200,
-        success: true,
-        message: 'All Notification',
-        data: result,
-      });
-})
+  const notification_id = req.query.notification_id as string;
+  const converted_notification_id = idConverter(notification_id);
 
+  const result = await notificationServices.viewSpecificNotification(
+    converted_notification_id as Types.ObjectId,
+    converted_user_id as Types.ObjectId,
+  );
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Found single notification',
+    data: result,
+  });
+});
 
-const viewSpecificNotification = catchAsync(async(req, res)=>{
+const sendNotificationFromAdmin = catchAsync(async (req, res) => {
+  const result = await notificationServices.sendNotificationFromAdmin(req.body);
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Notification sent successfully',
+    data: result,
+  });
+});
 
-    const user_id = req.user.id
-    const converted_user_id= idConverter(user_id)
-
-    const notification_id = req.query.notification_id as string
-    const converted_notification_id= idConverter(notification_id)
-
-    const result = await notificationServices.viewSpecificNotification(converted_notification_id as Types.ObjectId, converted_user_id as Types.ObjectId)
-    golbalRespnseHandler(res, {
-        statusCode: 200,
-        success: true,
-        message: 'Found single notification',
-        data: result,
-      });
-})
-
-
-const sendNotificationFromAdmin= catchAsync(async(req,res)=>{
-
-    const result = await notificationServices.sendNotificationFromAdmin(req.body)
-    golbalRespnseHandler(res, {
-        statusCode: 200,
-        success: true,
-        message: 'Notification sent successfully',
-        data: result,
-      });
-})
-
-
-const getAllNotificationForAdmin= catchAsync(async(req,res)=>{
-    const notificationType = req.query.notificationType as string
-    const result = await notificationServices.getAllNotificationForAdmin(notificationType)
-    golbalRespnseHandler(res, {
-        statusCode: 200,
-        success: true,
-        message: 'Notification fetched successfully for admin',
-        data: result,
-      });
-})
-
+const getAllNotificationForAdmin = catchAsync(async (req, res) => {
+  const notificationType = req.query.notificationType as string;
+  const result =
+    await notificationServices.getAllNotificationForAdmin(notificationType);
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Notification fetched successfully for admin',
+    data: result,
+  });
+});
 
 const notificationController = {
-    getAllNotifications,viewSpecificNotification,sendNotificationFromAdmin,getAllNotificationForAdmin,getNotificationForNotificationBell
-}
+  getAllNotifications,
+  viewSpecificNotification,
+  sendNotificationFromAdmin,
+  getAllNotificationForAdmin,
+  getNotificationForNotificationBell,
+};
 
-
-export default notificationController
+export default notificationController;
