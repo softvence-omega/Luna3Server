@@ -1,19 +1,22 @@
-import { Types } from "mongoose"
+import { Types } from 'mongoose';
 
-export type TEachNotification={
-    user_id:Types.ObjectId,
-    Profile_id:Types.ObjectId,
-    notificationType:"interview_Progress"|"latest_job"|"upgrade_plan"|"admin_notification",
-    notificationDetail:string,
-    isSeen:boolean
+export type TEachNotification = {
+  user_id: Types.ObjectId;
+  Profile_id: Types.ObjectId;
+  notificationType:
+    | 'interview_Progress'
+    | 'latest_job'
+    | 'upgrade_plan'
+    | 'admin_notification';
+  notificationDetail: string;
+  isSeen: boolean;
+};
 
-}
-
-export type TNotificationList={
-    user_id:Types.ObjectId,
-    Profile_id:Types.ObjectId,
-    oldNotificationCount:number,
-    seenNotificationCount:number,
-    newNotification:number,
-    notificationList:Types.ObjectId[]
-}
+export type TNotificationList = {
+  user_id: Types.ObjectId;
+  Profile_id: Types.ObjectId;
+  oldNotificationCount: number;
+  seenNotificationCount: number;
+  newNotification: number;
+  notificationList: Types.ObjectId[];
+};
