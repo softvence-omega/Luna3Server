@@ -135,7 +135,7 @@ import { userRole } from '../../constents';
 // };
 
 
-const createUser = async (payload: Partial<TUser>, file: any, method?: string) => {
+const createUser = async (payload: Partial<TUser>, file?: any, method?: string) => {
   // Validate password match
   if (payload.password !== payload.confirmPassword) {
     throw new Error('Password and confirm password do not match.');
