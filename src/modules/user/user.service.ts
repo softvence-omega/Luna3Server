@@ -135,7 +135,7 @@ import { userRole } from '../../constents';
 // };
 
 
-const createUser = async (payload: Partial<TUser>, file: any, method?: string) => {
+const createUser = async (payload: Partial<TUser>, file?: any, method?: string) => {
   // Validate password match
   if (payload.password !== payload.confirmPassword) {
     throw new Error('Password and confirm password do not match.');
@@ -181,16 +181,34 @@ const createUser = async (payload: Partial<TUser>, file: any, method?: string) =
     await session.startTransaction();
     console.log('Transaction started');
 
-    // Upload image to Cloudinary
-    const imageName = `${userData.email}-${Date.now()}`; // Unique name
-    const uploadResult = await uploadImgToCloudinary(imageName, file.path);
-    const imageUrl = uploadResult.secure_url;
-    console.log('Image uploaded to Cloudinary:', imageUrl);
+    // // Upload image to Cloudinary
+    // const imageName = `${userData.email}-${Date.now()}`; // Unique name
+    // const uploadResult = await uploadImgToCloudinary(imageName, file.path);
+    // const imageUrl = uploadResult.secure_url;
+    // console.log('Image uploaded to Cloudinary:', imageUrl);
 
-    // Add image URL to userData
+    let imageUrl: string | undefined;
+
+    // Optional: Upload image to Cloudinary
+    if (file?.path) {
+      const imageName = `${userData.email}-${Date.now()}`;
+      const uploadResult = await uploadImgToCloudinary(imageName, file.path);
+      imageUrl = uploadResult.secure_url;
+      console.log('Image uploaded to Cloudinary:', imageUrl);
+    } else {
+      console.log('No image file provided, skipping upload');
+    }
+
+    // // Add image URL to userData
+    // const userDataWithImg = {
+    //   ...userData,
+    //   img: imageUrl, // Include Cloudinary image URL for UserModel
+    // };
+
+    // Add image URL to userData if available
     const userDataWithImg = {
       ...userData,
-      img: imageUrl, // Include Cloudinary image URL for UserModel
+      ...(imageUrl && { img: imageUrl }),
     };
 
     let user;
