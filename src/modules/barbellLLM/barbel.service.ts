@@ -56,7 +56,7 @@ const createExerciseRoutine = async (
 
   try {
     // Log payload for debugging
-    console.log('AI API payload:', constructDataForWorkoutRoutine);
+    console.log('AI API payload:======>>>>>', constructDataForWorkoutRoutine);
 
     // Make POST request to AI API
     const response = await fetch(fullAiApi, {

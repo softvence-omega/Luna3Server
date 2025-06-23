@@ -27,7 +27,7 @@ const UserHabitsSchema = new Schema<TUserHabits>({
     required: true,
     ref: 'habitCollection',
   },
-  isPusNotification: {
+  isPushNotification: {
     type: Boolean,
     required: true,
     default: false,
