@@ -7,14 +7,14 @@ const createTip = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized! Please login with credentials!!!' });
+      res.status(401).json({ message: 'Unauthorized! Please login with credentials!!!' });
     }
 
     let parsedData;
     try {
       parsedData = JSON.parse(req.body.data);
     } catch {
-      return res.status(400).json({ message: 'Invalid JSON format in "data"' });
+      res.status(400).json({ message: 'Invalid JSON format in "data"' });
     }
 
     const tip = await TipService.createTip(
@@ -108,11 +108,12 @@ const updateTip = async (req: Request, res: Response) => {
     const tip = await TipService.getTipById(req.params.id);
 
     if (!tip) {
-      return res.status(404).json({ message: 'Tip not found!' });
+      res.status(404).json({ message: 'Tip not found!' });
+      return;
     }
 
     if (tip.userId !== userId) {
-      return res.status(403).json({ message: 'Forbidden! Not your tip.' });
+      res.status(403).json({ message: 'Forbidden! Not your tip.' });
     }
 
     let parsedData: Partial<TTip> = {};
@@ -121,7 +122,7 @@ const updateTip = async (req: Request, res: Response) => {
       try {
         parsedData = JSON.parse(req.body.data);
       } catch {
-        return res.status(400).json({ message: 'Invalid JSON format in "data"' });
+        res.status(400).json({ message: 'Invalid JSON format in "data"' });
       }
     }
 
