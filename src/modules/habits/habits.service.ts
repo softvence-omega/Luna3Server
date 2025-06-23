@@ -185,6 +185,9 @@ const updateUserHabit = async (user_id:Types.ObjectId, habit_id:Types.ObjectId, 
         throw new Error('No habit found for the provided user ID and habit ID.');
       }
       console.log('Existing habit found:', existingHabit._id);
+
+
+      // console.log("payload", payLoad)
   
       // Update habit with all provided payload fields
       const updatedHabit = await UserHabitsModel.findOneAndUpdate(

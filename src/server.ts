@@ -3,6 +3,9 @@ import app from "./app";
 import { Server } from "http";
 import adminSeeder from "./seeder/adminSeeder";
 import config from "./config";
+import habitReminder from "./util/habitReminder";
+
+
 
 let server: Server;
 
@@ -16,6 +19,9 @@ async function main() {
     server = app.listen(config.port, () => {
       console.log(` LUNA3 app listening on port ${config.port}`);
     });
+
+    await habitReminder()
+    
   } 
   catch (err:any) {
     throw Error('something went wrong in server or mongoose connection');

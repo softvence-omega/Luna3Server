@@ -9,7 +9,7 @@ export type Thabit ={
 export type TUserHabits= {
     user_id:Types.ObjectId,
     habit_id:Types.ObjectId,
-    isPusNotification:boolean,
+    isPushNotification:boolean,
     reminderTime:Date,
     reminderInterval:Number,
     reminderDays:String[]
