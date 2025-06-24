@@ -54,9 +54,13 @@ const createExerciseRoutine = async (
   const aiWorkoutPlanEndPoint = 'create-workout-plan';
   const fullAiApi = `${config.AI_BASE_URL}${aiWorkoutPlanEndPoint}`;
 
+
+
   try {
     // Log payload for debugging
     console.log('AI API payload:======>>>>>', constructDataForWorkoutRoutine);
+
+    console.log("hitting api for work out plan", fullAiApi);
 
     // Make POST request to AI API
     const response = await fetch(fullAiApi, {
@@ -148,7 +152,7 @@ const updateExerciseRoutine = async (
   try {
     // Log payload for debugging
     console.log('AI API payload:', updateExerciseRoutinePayload);
-
+    console.log("hitting api for update exercise routine", fullAiApi);
     // Make POST request to AI API
     const response = await fetch(fullAiApi, {
       method: 'POST',
@@ -230,6 +234,7 @@ const sendMessageAndGetReply = async (user_id: Types.ObjectId, message: string) 
   const fullAiApi = `${config.AI_BASE_URL}${aiWorkoutPlanEndPoint}`;
 
   try {
+    console.log("hitting api for chat", fullAiApi);
     const response = await fetch(fullAiApi, {
       method: 'POST',
       headers: {
