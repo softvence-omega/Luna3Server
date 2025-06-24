@@ -141,7 +141,7 @@ const getExerciseById = async (exercise_id: Types.ObjectId) => {
       const meta = {
         set: 'required',
         reps: 'required',
-        restTime: 'required',
+        resetTime: 'required',
       };
   
       // Determine modifyFoundData based on exerciseType
@@ -175,12 +175,12 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExe
     }
   
     // Validate required payload fields
-    if (!payLoad.exercise_id || payLoad.set == null || payLoad.reps == null || payLoad.restTime == null) {
-      throw new Error('exercise_id, set, reps, and restTime are required.');
+    if (!payLoad.exercise_id || payLoad.set == null || payLoad.reps == null || payLoad.resetTime == null) {
+      throw new Error('exercise_id, set, reps, and resetTime are required.');
     }
   
     // Validate exercise_id
-    if (!Types.ObjectId.isValid(payLoad.exercise_id)) {
+    if (!Types.ObjectId.isValid(payLoad.exercise_id as Types.ObjectId)) {
       throw new Error('Invalid exercise ID.');
     }
   
@@ -221,7 +221,7 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExe
         set: payLoad.set,
         weightLifted: validatedWeightLifted,
         reps: payLoad.reps,
-        restTime: payLoad.restTime,
+        resetTime: payLoad.resetTime,
         isCompleted: false,
       };
   

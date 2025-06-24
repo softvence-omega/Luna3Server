@@ -35,6 +35,7 @@ const ExerciseSchema = new Schema<TExercise>({
   const UserExercisePerformSchema = new Schema<UserExercisePerform>({
     exercise_id: {
       type: Schema.Types.ObjectId,
+      ref:"Exercise",
       required: true,
     },
     user_id: {
@@ -55,7 +56,7 @@ const ExerciseSchema = new Schema<TExercise>({
       type: Number,
       required: true,
     },
-    restTime: {
+    resetTime: {
       type: Number,
       required: true,
     },

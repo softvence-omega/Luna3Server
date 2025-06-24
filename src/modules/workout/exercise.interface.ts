@@ -10,12 +10,12 @@ export type TExercise = {
   };
 
   export type UserExercisePerform={
-    exercise_id:Types.ObjectId;
-    user_id:Types.ObjectId;
+    exercise_id:Types.ObjectId | TExercise;
+    user_id:Types.ObjectId ;
     set:number;
     weightLifted:number;
     reps:number;
-    restTime:number;
+    resetTime:number;
     isCompleted:boolean;
     totalCaloryBurn:number;
 
