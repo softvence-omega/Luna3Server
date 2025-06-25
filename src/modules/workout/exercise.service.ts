@@ -7,6 +7,8 @@ import {
 import { ExerciseModel, UserExercisePerformModel } from './exercise.model';
 import { EXERCISE_TYPES } from '../../constents';
 
+
+
 const createCommonExercise = async (
   file: any,
   payload: Partial<TExercise>,
@@ -164,7 +166,9 @@ const getExerciseById = async (exercise_id: Types.ObjectId) => {
       console.error('Error fetching exercise:', error);
       throw new Error(error.message || 'Failed to retrieve exercise.');
     }
-  };
+};
+
+
 
 //user exercise perform
 
@@ -213,6 +217,33 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExe
         // For cardio, stretching, balance_Training, set weightLifted to 0
         validatedWeightLifted = 0;
       }
+
+      //prepare for calory burn
+
+      console.log("here we goooo ============+++++++=========>>>>>>>",findExercise)
+
+
+      const dataForCaloryCount={
+        exerciseName:findExercise.name,
+        exerciseType:findExercise.exerciseType,
+        weightLifted:validatedWeightLifted,
+        reps:payLoad.reps,
+        set:payLoad.set,
+        resetTime:payLoad.resetTime
+      }
+
+
+      console.log("data for calory count========<<<<>>>>>>>>", dataForCaloryCount)
+
+
+
+
+
+
+
+
+
+
   
       // Prepare data to save
       const exercisePerformData = {
