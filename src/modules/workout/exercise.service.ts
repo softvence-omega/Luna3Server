@@ -6,6 +6,7 @@ import {
 } from '../../util/uploadImgToCludinary';
 import { ExerciseModel, UserExercisePerformModel } from './exercise.model';
 import { EXERCISE_TYPES } from '../../constents';
+import { UserModel, WorkoutASetupModel } from '../user/user.model';
 
 
 
@@ -172,107 +173,154 @@ const getExerciseById = async (exercise_id: Types.ObjectId) => {
 
 //user exercise perform
 
-const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExercisePerform>) => {
-    // Validate user_id
+const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
+  exercise_id: Types.ObjectId;
+  set: number;
+  weightLifted?: number;
+  reps: number;
+  resetTime: number;
+  isCompleted: boolean;
+  totalCaloryBurn?: number;
+}>) => {
+  // Find user
+  const user = await WorkoutASetupModel.findOne({ user_id }).lean();
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Validate user_id
+  if (!Types.ObjectId.isValid(user_id)) {
+    throw new Error("Invalid user ID");
+  }
+
+  // Validate required payload fields
+  if (!payLoad.exercise_id || payLoad.set == null || payLoad.reps == null || payLoad.resetTime == null) {
+    throw new Error("exercise_id, set, reps, and resetTime are required");
+  }
+
+  // Validate exercise_id
+  if (!Types.ObjectId.isValid(payLoad.exercise_id as Types.ObjectId)) {
+    throw new Error("Invalid exercise ID");
+  }
+
+  // Check MongoDB connection
+  if (mongoose.connection.readyState !== 1) {
+    throw new Error("MongoDB connection is not ready");
+  }
+
+  try {
+    // Find exercise
+    const findExercise = await ExerciseModel.findOne({ _id: payLoad.exercise_id }).lean();
+    if (!findExercise) {
+      throw new Error("Exercise not found");
+    }
+
+    // Validate weightLifted based on exerciseType
+    let validatedWeightLifted: number = payLoad.weightLifted ?? 0;
+
+    if (findExercise.exerciseType === "weight_training") {
+      if (validatedWeightLifted <= 0) {
+        throw new Error("weightLifted is required and must be a positive number for weight_training");
+      }
+    } else if (
+      findExercise.exerciseType === "bodyweight_exercises" ||
+      findExercise.exerciseType === "high_Intensity" ||
+      findExercise.exerciseType === "strength_Training"
+    ) {
+      // weightLifted is optional; keep as is
+    } else {
+      // For cardio, stretching, balance_Training, set weightLifted to 0
+      validatedWeightLifted = 0;
+    }
+
+    // Prepare data to save
+    const exercisePerformData = {
+      exercise_id: payLoad.exercise_id,
+      user_id,
+      set: payLoad.set,
+      weightLifted: validatedWeightLifted,
+      reps: payLoad.reps,
+      resetTime: payLoad.resetTime,
+      isCompleted: false,
+    };
+
+    // Save to UserExercisePerformModel
+    const savedExercisePerform = await UserExercisePerformModel.create(exercisePerformData);
+
+    return savedExercisePerform;
+  } catch (error: any) {
+    console.error("Error creating user exercise perform:", error);
+    throw new Error(error.message || "Failed to create user exercise perform");
+  }
+};
+
+const markExerciseAsCompleated = async (user_id: Types.ObjectId, Performed_exercise_id: Types.ObjectId) => {
+  try {
+    // Validate inputs
     if (!Types.ObjectId.isValid(user_id)) {
-      throw new Error('Invalid user ID.');
+      throw new Error("Invalid user ID");
     }
-  
-    // Validate required payload fields
-    if (!payLoad.exercise_id || payLoad.set == null || payLoad.reps == null || payLoad.resetTime == null) {
-      throw new Error('exercise_id, set, reps, and resetTime are required.');
+    if (!Types.ObjectId.isValid(Performed_exercise_id)) {
+      throw new Error("Invalid performed exercise ID");
     }
-  
-    // Validate exercise_id
-    if (!Types.ObjectId.isValid(payLoad.exercise_id as Types.ObjectId)) {
-      throw new Error('Invalid exercise ID.');
+
+    // Find user
+    const user = await WorkoutASetupModel.findOne({ user_id }).lean();
+    if (!user) {
+      throw new Error("User not found");
     }
-  
-    // Check MongoDB connection
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error('MongoDB connection is not ready.');
+
+    // Find performed exercise
+    const performedExercise = await UserExercisePerformModel.findOne({
+      _id: Performed_exercise_id,
+      user_id
+    }).lean();
+    if (!performedExercise) {
+      throw new Error("Performed exercise not found");
     }
-  
-    try {
-      // Find exercise
-      const findExercise = await ExerciseModel.findOne({ _id: payLoad.exercise_id }).lean();
-      if (!findExercise) {
-        throw new Error('Exercise not found.');
-      }
-  
-      // Validate weightLifted based on exerciseType
-      let validatedWeightLifted: number = payLoad.weightLifted ?? 0;
-  
-      if (findExercise.exerciseType === EXERCISE_TYPES.weight_training) {
-        if (validatedWeightLifted <= 0) {
-          throw new Error('weightLifted is required and must be a positive number for weight_training.');
-        }
-      } else if (
-        findExercise.exerciseType === EXERCISE_TYPES.bodyweight_exercises ||
-        findExercise.exerciseType === EXERCISE_TYPES.high_Intensity ||
-        findExercise.exerciseType === EXERCISE_TYPES.strength_Training
-      ) {
-        // weightLifted is optional; keep as is (number or 0)
-      } else {
-        // For cardio, stretching, balance_Training, set weightLifted to 0
-        validatedWeightLifted = 0;
-      }
 
-      //prepare for calory burn
-
-      console.log("here we goooo ============+++++++=========>>>>>>>",findExercise)
-
-
-      const dataForCaloryCount={
-        exerciseName:findExercise.name,
-        exerciseType:findExercise.exerciseType,
-        exerciseDescription:findExercise.description,
-        weightLifted:validatedWeightLifted,
-        reps:payLoad.reps,
-        set:payLoad.set,
-        resetTime:payLoad.resetTime
-      }
-
-
-      console.log("data for calory count========<<<<>>>>>>>>", dataForCaloryCount)
-
-
-
-
-
-
-
-
-
-
-  
-      // Prepare data to save
-      const exercisePerformData = {
-        exercise_id: payLoad.exercise_id,
-        user_id,
-        set: payLoad.set,
-        weightLifted: validatedWeightLifted,
-        reps: payLoad.reps,
-        resetTime: payLoad.resetTime,
-        isCompleted: false,
-      };
-  
-      // Save to UserExercisePerformModel
-      const savedExercisePerform = await UserExercisePerformModel.create(exercisePerformData);
-  
-      return savedExercisePerform;
-    } catch (error: any) {
-      console.error('Error creating user exercise perform:', error);
-      throw new Error(error.message || 'Failed to create user exercise perform.');
+    // Find exercise details
+    const exercise = await ExerciseModel.findOne({ _id: performedExercise.exercise_id }).lean();
+    if (!exercise) {
+      throw new Error("Exercise not found");
     }
-  };
 
+    // Prepare data for calorie calculation AI route
+    const dataForCaloryCount = {
+      userHight: user.height, // Assuming typo in original ("userHight" instead of "height")
+      userWeight: user.weight,
+      exerciseName: exercise.name,
+      exerciseType: exercise.exerciseType,
+      exerciseDescription: exercise.description,
+      weightLifted: performedExercise.weightLifted,
+      reps: performedExercise.reps,
+      set: performedExercise.set,
+      resetTime: performedExercise.resetTime
+    };
 
-const markExerciseAsCompleated = async (user_id:Types.ObjectId, Performed_exercise_id:Types.ObjectId)=>{
-    const markAsDone = await UserExercisePerformModel.findOneAndUpdate({_id:Performed_exercise_id, user_id:user_id},{isCompleted:true},{new:true})
-    //call ai for calory burn count and then update the totalCalory Burn
-    return markAsDone
-}
+    console.log("Data for calorie count:", dataForCaloryCount);
+
+    // TODO: Call AI route to calculate totalCaloryBurn
+    // Example: const totalCaloryBurn = await aiService.calculateCalories(dataForCaloryCount);
+    const totalCaloryBurn = 0; // Placeholder until AI route is implemented
+
+    // Update exercise as completed with calorie burn
+    const markAsDone = await UserExercisePerformModel.findOneAndUpdate(
+      { _id: Performed_exercise_id, user_id },
+      { isCompleted: true, totalCaloryBurn },
+      { new: true }
+    );
+
+    if (!markAsDone) {
+      throw new Error("Failed to mark exercise as completed");
+    }
+
+    return markAsDone;
+  } catch (error: any) {
+    console.error(`Error marking exercise as completed for user ${user_id}:`, error);
+    throw new Error(error.message || "Failed to mark exercise as completed");
+  }
+};
 
 
 const exerciseServicves = {
