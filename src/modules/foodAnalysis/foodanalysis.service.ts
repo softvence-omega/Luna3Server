@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { UserConsumedFoodModel } from "../foodLooging/food.model";
+import { WorkoutASetupModel } from "../user/user.model";
 
 export const getDailyNutritionSummary = async (
   userId: string,
@@ -65,6 +66,81 @@ export const getDailyNutritionSummary = async (
     total,
   };
 };
+
+export const getUserNutritionProgress = async (
+    userId: string,
+    timeRange: number
+  ) => {
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - timeRange);
+  
+    // Step 1: Get User Goal
+    const workoutSetup = await WorkoutASetupModel.findOne({ user_id: userId });
+    if (!workoutSetup) {
+      throw new Error("Workout setup not found for user");
+    }
+  
+    const goal = {
+      calorieGoal: workoutSetup.calorieGoal,
+      proteinGoal: workoutSetup.proteinGoal,
+      carbsGoal: workoutSetup.carbsGoal,
+      fatsGoal: workoutSetup.fatsGoal,
+      fiberGoal: workoutSetup.fiberGoal,
+    };
+  
+    // Step 2: Aggregate consumed data
+    const [consumed] = await UserConsumedFoodModel.aggregate([
+      {
+        $match: {
+          user_id: new mongoose.Types.ObjectId(userId),
+          createdAt: { $gte: fromDate },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalCalories: {
+            $sum: { $multiply: ["$nutritionPerServing.calories", "$servings"] },
+          },
+          totalProtein: {
+            $sum: { $multiply: ["$nutritionPerServing.protein", "$servings"] },
+          },
+          totalCarbs: {
+            $sum: { $multiply: ["$nutritionPerServing.carbs", "$servings"] },
+          },
+          totalFats: {
+            $sum: { $multiply: ["$nutritionPerServing.fats", "$servings"] },
+          },
+          totalFiber: {
+            $sum: { $multiply: ["$nutritionPerServing.fiber", "$servings"] },
+          },
+        },
+      },
+    ]);
+  
+    const actual = consumed || {
+      totalCalories: 0,
+      totalProtein: 0,
+      totalCarbs: 0,
+      totalFats: 0,
+      totalFiber: 0,
+    };
+  
+    // Step 3: Calculate difference and percentage
+    const calculateProgress = (goal: number, actual: number) => {
+      const remaining = Math.max(goal - actual, 0);
+      const progress = goal > 0 ? Math.min((actual / goal) * 100, 100) : 0;
+      return { goal, actual, remaining, progress: Number(progress.toFixed(2)) };
+    };
+  
+    return {
+      calories: calculateProgress(goal.calorieGoal, actual.totalCalories),
+      protein: calculateProgress(goal.proteinGoal, actual.totalProtein),
+      carbs: calculateProgress(goal.carbsGoal, actual.totalCarbs),
+      fats: calculateProgress(goal.fatsGoal, actual.totalFats),
+      fiber: calculateProgress(goal.fiberGoal, actual.totalFiber),
+    };
+  };
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);

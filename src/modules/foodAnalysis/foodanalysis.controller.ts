@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getDailyNutritionSummary } from "./foodanalysis.service";
+import { getDailyNutritionSummary, getUserNutritionProgress } from "./foodanalysis.service";
 
 export const getNutritionSummary = async (req: Request, res: Response) => {
   try {
@@ -33,3 +33,21 @@ export const getNutritionSummary = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+
+export const getNutritionProgress = async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const timeRange = parseInt(req.query.timeRange as string) || 1;
+  
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+      }
+  
+      const result = await getUserNutritionProgress(userId, timeRange);
+      res.status(200).json({ success: true, data: result });
+    } catch (err) {
+      console.error("Error in getNutritionProgress:", err);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };

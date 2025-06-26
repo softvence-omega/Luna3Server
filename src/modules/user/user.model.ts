@@ -51,11 +51,11 @@ const WorkoutASetupSchema = new Schema<TWorkoutASetup>({
     enum: ['jogging', 'walking', 'hiking', 'skating', 'biking', 'weightLift', 'cardio', 'yoga', 'other'], 
     required: true 
   },
-  calorieGoal: { type: Number, required: true },
-  proteinGoal: { type: Number, required: true },
-  carbsGoal: { type: Number, required: true },
-  fatsGoal: { type: Number, required: true },
-  fiberGoal: { type: Number, required: true },
+  calorieGoal: { type: Number, required: true, default: 0 },
+  proteinGoal: { type: Number, required: true, default: 0 },
+  carbsGoal: { type: Number, required: true, default: 0 },
+  fatsGoal: { type: Number, required: true, default: 0 },
+  fiberGoal: { type: Number, required: true, default: 0 },
   sleepQuality: { type: SleepQualitySchema, required: true }
 });
 
