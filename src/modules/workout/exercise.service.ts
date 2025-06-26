@@ -7,6 +7,7 @@ import {
 import { ExerciseModel, UserExercisePerformModel } from './exercise.model';
 import { EXERCISE_TYPES } from '../../constents';
 import { UserModel, WorkoutASetupModel } from '../user/user.model';
+import axios from 'axios';
 
 
 
@@ -254,7 +255,10 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
   }
 };
 
-const markExerciseAsCompleated = async (user_id: Types.ObjectId, Performed_exercise_id: Types.ObjectId) => {
+const markExerciseAsCompleated = async (
+  user_id: Types.ObjectId,
+  Performed_exercise_id: Types.ObjectId
+) => {
   try {
     // Validate inputs
     if (!Types.ObjectId.isValid(user_id)) {
@@ -287,22 +291,48 @@ const markExerciseAsCompleated = async (user_id: Types.ObjectId, Performed_exerc
 
     // Prepare data for calorie calculation AI route
     const dataForCaloryCount = {
-      userHight: user.height, // Assuming typo in original ("userHight" instead of "height")
-      userWeight: user.weight,
+      height: user.height,
+      body_weight: user.weight,
       exerciseName: exercise.name,
       exerciseType: exercise.exerciseType,
       exerciseDescription: exercise.description,
       weightLifted: performedExercise.weightLifted,
       reps: performedExercise.reps,
-      set: performedExercise.set,
-      resetTime: performedExercise.resetTime
+      sets: performedExercise.set,
+      resetTime: performedExercise.resetTime,
+      restTime: 1 // Assuming restTime is 1 minute for simplicity
     };
 
     console.log("Data for calorie count:", dataForCaloryCount);
 
-    // TODO: Call AI route to calculate totalCaloryBurn
-    // Example: const totalCaloryBurn = await aiService.calculateCalories(dataForCaloryCount);
-    const totalCaloryBurn = 0; // Placeholder until AI route is implemented
+    // Call AI API
+    let totalCaloryBurn = 0;
+    try {
+      const response = await axios.post(
+        `${process.env.AI_BASE_URL}workout-calorie/calculate-calories`,
+        dataForCaloryCount,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 10000
+        }
+      );
+
+      console.log("AI API response:", response.data);
+
+      if (!response.data || typeof response.data.total_calories_burned !== 'number') {
+        throw new Error("Invalid response from calorie AI API");
+      }
+
+      totalCaloryBurn = response.data.total_calories_burned;
+    } catch (apiError: any) {
+      console.error("AI API error detail:", apiError.response?.data || apiError.message);
+      throw new Error(
+        "Failed to calculate calories from AI API: " +
+        (apiError.response?.data?.message || apiError.message)
+      );
+    }
 
     // Update exercise as completed with calorie burn
     const markAsDone = await UserExercisePerformModel.findOneAndUpdate(

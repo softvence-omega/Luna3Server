@@ -44,6 +44,10 @@ export type TWorkoutASetup = {
   dietaryPreference: 'plant_based' | 'carbo_diet' | 'specialized' | 'traditional'; // Fixed: Traditional -> traditional
   exercisePreference: 'jogging' | 'walking' | 'hiking' | 'skating' | 'biking' | 'weightLift' | 'cardio' | 'yoga' | 'other';
   calorieGoal: number;
+  proteinGoal: number;
+  carbsGoal: number;
+  fatsGoal: number;
+  fiberGoal: number;
   sleepQuality: TSleepQuality;
 };
 
