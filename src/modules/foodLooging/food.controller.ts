@@ -107,10 +107,75 @@ const getAllFood = catchAsync(async(req,res)=>{
   });
 })
 
+
+const updateFood = catchAsync(async (req, res) => {
+  const foodId = req.query.foodId as string;
+  const userId = req.user?.id as string;
+  const foodData = JSON.parse(req.body.data || '{}'); // Parse food data from request body
+  const file = req.file; // From multer for image upload
+
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (typeof userId !== "string") {
+    throw new Error("Invalid user ID");
+  }
+
+  let convertedUserId: Types.ObjectId;
+  let convertedFoodId: Types.ObjectId;
+  try {
+    convertedUserId = idConverter(userId) as Types.ObjectId;
+    convertedFoodId= idConverter(foodId) as Types.ObjectId;
+  } catch (error) {
+    throw new Error("Invalid user ID format");
+  }
+
+  if (!Types.ObjectId.isValid(foodId)) {
+    throw new Error("Invalid food ID");
+  }
+
+  const updatedFood = await foodLoadingServices.updateFood(
+    convertedFoodId,
+    convertedUserId,
+    foodData,
+    file
+  );
+
+  res.status(200).json({ success: true, message: "Food updated successfully", data: updatedFood });
+});
+
+
+const deleteFood = catchAsync(async (req, res) => {
+  const foodId = req.query.foodId as string;
+  const userId = req.user?.id as string;
+
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+
+
+  let convertedUserId: Types.ObjectId;
+  let convertedFoodId: Types.ObjectId;
+  try {
+    convertedUserId = idConverter(userId) as Types.ObjectId;
+    convertedFoodId = idConverter(foodId) as Types.ObjectId;
+  } catch (error) {
+    throw new Error("Invalid user ID format");
+  }
+
+
+
+  await foodLoadingServices.deleteFood(convertedFoodId, convertedUserId);
+
+  res.status(200).json({ success: true, message: "Food deleted successfully" });
+});
+
 const foodLoaderController = {
   addFoodManually,
   addPersonalizeFoodManually,
-  addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood
+  addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood,updateFood,deleteFood
 };
 
 export default foodLoaderController;

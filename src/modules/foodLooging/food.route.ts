@@ -32,4 +32,17 @@ foodRoutes.get(
   foodLoaderController.getAllFood,
 );
 
+foodRoutes.delete(
+  '/deleteFood',
+  auth([userRole.admin, userRole.user]),
+  foodLoaderController.deleteFood,
+);
+
+foodRoutes.put(
+  '/updateFood',
+  auth([userRole.admin, userRole.user]),
+  upload.single('file'),
+  foodLoaderController.updateFood,
+);
+
 export default foodRoutes;

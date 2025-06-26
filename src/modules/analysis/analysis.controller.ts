@@ -54,15 +54,19 @@ const runAnalysis = catchAsync(async (req, res) => {
     }
   
     // Validate filterParameter
-    const validFilters: Array<"duration" | "volume" | "reps" | "totalCaloryBurn"> = [
-      "duration",
-      "volume",
-      "reps",
-      "totalCaloryBurn"
-    ];
-    if (!validFilters.includes(filterParameter as any)) {
-      throw new Error("Invalid filter parameter");
+    if(filterParameter)
+    {
+      const validFilters: Array<"duration" | "volume" | "reps" | "totalCaloryBurn"> = [
+        "duration",
+        "volume",
+        "reps",
+        "totalCaloryBurn"
+      ];
+      if (!validFilters.includes(filterParameter as any)) {
+        throw new Error("Invalid filter parameter");
+      }
     }
+
   
     // Run analysis
     const result = await analysisService.runAnalysis(
