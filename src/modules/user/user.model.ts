@@ -52,6 +52,10 @@ const WorkoutASetupSchema = new Schema<TWorkoutASetup>({
     required: true 
   },
   calorieGoal: { type: Number, required: true },
+  proteinGoal: { type: Number, required: true },
+  carbsGoal: { type: Number, required: true },
+  fatsGoal: { type: Number, required: true },
+  fiberGoal: { type: Number, required: true },
   sleepQuality: { type: SleepQualitySchema, required: true }
 });
 
