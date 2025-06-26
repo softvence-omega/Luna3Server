@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import cron from 'node-cron';
 import { UserHabitsModel } from '../modules/habits/habits.model'; // Adjust path as needed
+import { sendSingleNotification } from '../firebaseSetup/sendPushNotification';
 
 // Utility function to check if date1 is same as or later than date2
 const isSameOrLaterDay = (date1: Date, date2: Date): boolean => {
@@ -35,18 +36,25 @@ const addMinutes = (date: Date, minutes: number): Date => {
 const habitReminder = async () => {
   try {
     const now = new Date();
-    console.log(`Running habit reminder cron job at: ${now.toISOString()} (UTC), ${now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })} (BST)`);
+    console.log(
+      `Running habit reminder cron job at: ${now.toISOString()} (UTC), ${now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })} (BST)`,
+    );
 
     // Get current day in UTC to match reminderTime
-    const currentDay = now.toLocaleString('en-US', { weekday: 'long', timeZone: 'UTC' }); // e.g., "Monday"
+    const currentDay = now.toLocaleString('en-US', {
+      weekday: 'long',
+      timeZone: 'UTC',
+    }); // e.g., "Monday"
 
     // Query habits with push notifications enabled and matching day
     const habits = await UserHabitsModel.find({
       isPushNotification: true,
     });
-console.log("habbits", habits)
+    console.log('habbits', habits);
     if (!habits.length) {
-      console.log(`No habits found with isPushNotification: true for ${currentDay} at ${now.toISOString()} (UTC)`);
+      console.log(
+        `No habits found with isPushNotification: true for ${currentDay} at ${now.toISOString()} (UTC)`,
+      );
       return;
     }
 
@@ -54,13 +62,7 @@ console.log("habbits", habits)
 
     // Process each habit
     for (const habit of habits) {
-      const {
-        _id,
-        reminderTime,
-        reminderInterval,
-        user_id,
-        habit_id,
-      } = habit;
+      const { _id, reminderTime, reminderInterval, user_id, habit_id } = habit;
 
       try {
         const reminderDate = new Date(reminderTime);
@@ -68,20 +70,40 @@ console.log("habbits", habits)
         if (isSameOrLaterDay(now, reminderDate)) {
           // Check if current time matches reminderTime
           if (isSameMinute(now, reminderDate)) {
-            console.log(`Processing reminder for habit ${habit_id} (ID: ${_id}) for user ${user_id}, reminderTime: ${reminderTime.toISOString()} (BST: ${reminderDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`);
+            console.log(
+              `Processing reminder for habit ${habit_id} (ID: ${_id}) for user ${user_id}, reminderTime: ${reminderTime.toISOString()} (BST: ${reminderDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`,
+            );
 
             // Send notification email (commented out as in original code)
-            console.log(`Sending push notification email for habit ${habit_id}`);
+            console.log(
+              `Sending push notification email for habit ${habit_id}`,
+            );
             try {
+              const subject = `⏰ Reminder for your habit!`;
+              const body = `This is a friendly reminder for your habit "${habit_id}" scheduled at ${new Date(reminderTime).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}. Stay consistent and keep going! 💪`;
+
+              const result = await sendSingleNotification(
+                new Types.ObjectId(user_id),
+                subject,
+                body,
+              );
+              console.log(
+                `📩 Email status for habit ${habit_id}:`,
+                result.message,
+              );
               // await sendNotificationEmail({
               //   user_id: new Types.ObjectId(user_id),
               //   habit_id: new Types.ObjectId(habit_id),
               //   reminderTime: reminderTime.toISOString(),
               // });
-              console.log(`Notification email sent successfully for habit=====>>>>>>>>> ${habit_id}`);
-            } 
-            catch (emailError: any) {
-              console.error(`Failed to send notification email for habit ${habit_id}:`, emailError.message);
+              console.log(
+                `Notification email sent successfully for habit=====>>>>>>>>> ${habit_id}`,
+              );
+            } catch (emailError: any) {
+              console.error(
+                `Failed to send notification email for habit ${habit_id}:`,
+                emailError.message,
+              );
               // Continue to update time even if email fails
             }
 
@@ -89,16 +111,22 @@ console.log("habbits", habits)
             const intervalMinutes = Number(reminderInterval);
 
             // Update reminderTime by adding reminderInterval (in minutes)
-            const newReminderTime = addMinutes(new Date(reminderTime), intervalMinutes);
-            console.log(`Updating reminderTime for habit ${habit_id} to: ${newReminderTime.toISOString()} (BST: ${newReminderTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`);
+            const newReminderTime = addMinutes(
+              new Date(reminderTime),
+              intervalMinutes,
+            );
+            console.log(
+              `Updating reminderTime for habit ${habit_id} to: ${newReminderTime.toISOString()} (BST: ${newReminderTime.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`,
+            );
 
             await UserHabitsModel.updateOne(
               { _id: _id },
               { $set: { reminderTime: newReminderTime } },
             );
-            console.log(`Reminder time updated successfully for habit ${habit_id}`);
-          } 
-          else {
+            console.log(
+              `Reminder time updated successfully for habit ${habit_id}`,
+            );
+          } else {
             console.log(
               `Skipping habit ${habit_id}: Time mismatch (now: ${now.toISOString()}, reminder: ${reminderTime.toISOString()})`,
             );
@@ -109,7 +137,10 @@ console.log("habbits", habits)
           );
         }
       } catch (habitError: any) {
-        console.error(`Error processing habit ${habit_id} (ID: ${_id}):`, habitError.message);
+        console.error(
+          `Error processing habit ${habit_id} (ID: ${_id}):`,
+          habitError.message,
+        );
         // Continue processing other habits
       }
     }
