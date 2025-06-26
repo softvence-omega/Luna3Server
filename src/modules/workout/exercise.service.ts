@@ -226,6 +226,7 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<UserExe
       const dataForCaloryCount={
         exerciseName:findExercise.name,
         exerciseType:findExercise.exerciseType,
+        exerciseDescription:findExercise.description,
         weightLifted:validatedWeightLifted,
         reps:payLoad.reps,
         set:payLoad.set,
