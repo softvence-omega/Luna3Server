@@ -2,6 +2,71 @@ import mongoose from "mongoose";
 import { UserConsumedFoodModel } from "../foodLooging/food.model";
 import { WorkoutASetupModel } from "../user/user.model";
 
+// export const getDailyNutritionSummary = async (
+//   userId: string,
+//   timeRange: number,
+//   filterArray?: string[]
+// ) => {
+//   const fields = ['calories', 'protein', 'carbs', 'fats', 'fiber'];
+//   const selectedFields = filterArray || fields;
+
+//   // Step 1: Build match filter
+//   const fromDate = new Date();
+//   fromDate.setDate(fromDate.getDate() - timeRange);
+//   const matchFilter = {
+//     user_id: new mongoose.Types.ObjectId(userId),
+//     createdAt: { $gte: fromDate },
+//   };
+
+//   // Step 2: Aggregate from DB
+//   const groupStage: Record<string, any> = {
+//     _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+//   };
+
+//   for (const key of selectedFields) {
+//     groupStage[`total${capitalize(key)}`] = {
+//       $sum: { $multiply: [`$nutritionPerServing.${key}`, "$servings"] },
+//     };
+//   }
+
+//   const dbResults = await UserConsumedFoodModel.aggregate([
+//     { $match: matchFilter },
+//     { $group: groupStage },
+//     { $sort: { _id: 1 } },
+//   ]);
+
+//   // Step 3: Fill missing dates with zero values
+//   const resultMap = new Map<string, any>();
+//   for (const dayData of dbResults) resultMap.set(dayData._id, dayData);
+
+//   const finalData: any[] = [];
+//   const total: Record<string, number> = {};
+//   selectedFields.forEach(key => total[`total${capitalize(key)}`] = 0);
+
+//   for (let i = 0; i < timeRange; i++) {
+//     const date = new Date();
+//     date.setDate(date.getDate() - (timeRange - 1 - i));
+//     const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+//     const existing = resultMap.get(dateStr);
+//     const dayEntry: Record<string, any> = { date: dateStr };
+
+//     for (const key of selectedFields) {
+//       const fieldName = `total${capitalize(key)}`;
+//       const val = existing?.[fieldName] || 0;
+//       dayEntry[fieldName] = val;
+//       total[fieldName] += val;
+//     }
+
+//     finalData.push(dayEntry);
+//   }
+
+//   return {
+//     daily: finalData,
+//     total,
+//   };
+// };
+
 export const getDailyNutritionSummary = async (
   userId: string,
   timeRange: number,
@@ -10,15 +75,15 @@ export const getDailyNutritionSummary = async (
   const fields = ['calories', 'protein', 'carbs', 'fats', 'fiber'];
   const selectedFields = filterArray || fields;
 
-  // Step 1: Build match filter
   const fromDate = new Date();
   fromDate.setDate(fromDate.getDate() - timeRange);
+
   const matchFilter = {
     user_id: new mongoose.Types.ObjectId(userId),
     createdAt: { $gte: fromDate },
   };
 
-  // Step 2: Aggregate from DB
+  // Step 1: Aggregate overall daily totals
   const groupStage: Record<string, any> = {
     _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
   };
@@ -35,22 +100,60 @@ export const getDailyNutritionSummary = async (
     { $sort: { _id: 1 } },
   ]);
 
-  // Step 3: Fill missing dates with zero values
-  const resultMap = new Map<string, any>();
-  for (const dayData of dbResults) resultMap.set(dayData._id, dayData);
+  // Step 2: Aggregate by date + meal (for per-meal totals)
+  const perMealGroupStage: Record<string, any> = {
+    _id: {
+      date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+      meal: "$consumedAs",
+    },
+  };
 
+  for (const key of selectedFields) {
+    perMealGroupStage[`total${capitalize(key)}`] = {
+      $sum: { $multiply: [`$nutritionPerServing.${key}`, "$servings"] },
+    };
+  }
+
+  const perMealResults = await UserConsumedFoodModel.aggregate([
+    { $match: matchFilter },
+    { $group: perMealGroupStage },
+  ]);
+
+  // Step 3: Organize aggregated data
+  const resultMap = new Map<string, any>();
+  for (const row of dbResults) {
+    resultMap.set(row._id, row);
+  }
+
+  const mealMap = new Map<string, any>();
+  for (const row of perMealResults) {
+    const { date, meal } = row._id;
+    if (!mealMap.has(date)) {
+      mealMap.set(date, {});
+    }
+    mealMap.get(date)[meal] = {};
+
+    for (const key of selectedFields) {
+      mealMap.get(date)[meal][`total${capitalize(key)}`] = row[`total${capitalize(key)}`] || 0;
+    }
+  }
+
+  // Step 4: Build final response
   const finalData: any[] = [];
   const total: Record<string, number> = {};
   selectedFields.forEach(key => total[`total${capitalize(key)}`] = 0);
 
+  const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
+
   for (let i = 0; i < timeRange; i++) {
     const date = new Date();
     date.setDate(date.getDate() - (timeRange - 1 - i));
-    const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const dateStr = date.toISOString().split("T")[0];
 
     const existing = resultMap.get(dateStr);
     const dayEntry: Record<string, any> = { date: dateStr };
 
+    // Daily total
     for (const key of selectedFields) {
       const fieldName = `total${capitalize(key)}`;
       const val = existing?.[fieldName] || 0;
@@ -58,6 +161,18 @@ export const getDailyNutritionSummary = async (
       total[fieldName] += val;
     }
 
+    // Daily meals breakdown
+    const meals: Record<string, any> = {};
+    const mealData = mealMap.get(dateStr) || {};
+    for (const meal of mealTypes) {
+      meals[meal] = {};
+      for (const key of selectedFields) {
+        const field = `total${capitalize(key)}`;
+        meals[meal][field] = mealData?.[meal]?.[field] || 0;
+      }
+    }
+
+    dayEntry.consumedMeals = meals;
     finalData.push(dayEntry);
   }
 
@@ -66,6 +181,7 @@ export const getDailyNutritionSummary = async (
     total,
   };
 };
+
 
 export const getUserNutritionProgress = async (
     userId: string,

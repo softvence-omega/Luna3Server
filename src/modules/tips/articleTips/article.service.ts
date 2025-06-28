@@ -4,7 +4,10 @@ import { TTipArticle } from './article.interface';
 import { TipArticleModel } from './article.model';
 import { ProfileModel } from '../../user/user.model';
 
-const createTip = async (data: any, filePath?: string): Promise<TTipArticle> => {
+const createTip = async (
+  data: any,
+  filePath?: string,
+): Promise<TTipArticle> => {
   let imageUrl: string;
 
   if (!data.image && !filePath) {
@@ -39,16 +42,53 @@ const createTip = async (data: any, filePath?: string): Promise<TTipArticle> => 
   return tip;
 };
 
-const getTips = async (userId?: string) => {
-  const tips = await TipArticleModel.find().sort({ createdAt: -1 });
+// const getTips = async (userId?: string) => {
+//   const tips = await TipArticleModel.find().sort({ createdAt: -1 });
 
-  if (!userId) return tips;
+//   if (!userId) return tips;
+
+//   const profile = await ProfileModel.findOne({ user_id: userId }).lean();
+//   const savedTips = profile?.savedArticleTips?.map(id => id.toString()) || [];
+//   const likedTips = profile?.likedArticleTips?.map(id => id.toString()) || [];
+
+//   return tips.map(tip => {
+//     const tipIdStr = tip._id.toString();
+//     return {
+//       ...tip.toObject(),
+//       saved: savedTips.includes(tipIdStr),
+//       liked: likedTips.includes(tipIdStr),
+//     };
+//   });
+// };
+
+const getTips = async (
+  userId?: string,
+  page: number = 1,
+  limit: number = 10,
+  search?: string,
+) => {
+  const filter: any = {};
+
+  if (search) {
+    filter.title = { $regex: search, $options: 'i' };
+  }
+
+  const skip = (page - 1) * limit;
+
+  const total = await TipArticleModel.countDocuments(filter);
+
+  const tips = await TipArticleModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  if (!userId) return { tips, total };
 
   const profile = await ProfileModel.findOne({ user_id: userId }).lean();
-  const savedTips = profile?.savedArticleTips?.map(id => id.toString()) || [];
-  const likedTips = profile?.likedArticleTips?.map(id => id.toString()) || [];
+  const savedTips = profile?.savedArticleTips?.map((id) => id.toString()) || [];
+  const likedTips = profile?.likedArticleTips?.map((id) => id.toString()) || [];
 
-  return tips.map(tip => {
+  const tipsWithFlags = tips.map((tip) => {
     const tipIdStr = tip._id.toString();
     return {
       ...tip.toObject(),
@@ -56,17 +96,23 @@ const getTips = async (userId?: string) => {
       liked: likedTips.includes(tipIdStr),
     };
   });
+
+  return { tips: tipsWithFlags, total };
 };
 
 const toggleSave = async (userId: string, articleId: string) => {
   const profile = await ProfileModel.findOne({ user_id: userId });
   if (!profile) throw new Error('Profile not found');
 
-  const isAlreadySaved = profile.savedArticleTips?.some(id => id.toString() === articleId);
+  const isAlreadySaved = profile.savedArticleTips?.some(
+    (id) => id.toString() === articleId,
+  );
 
   await ProfileModel.updateOne(
     { user_id: userId },
-    { [isAlreadySaved ? '$pull' : '$addToSet']: { savedArticleTips: articleId } }
+    {
+      [isAlreadySaved ? '$pull' : '$addToSet']: { savedArticleTips: articleId },
+    },
   );
 
   return { saved: !isAlreadySaved };
@@ -76,29 +122,35 @@ const toggleLike = async (userId: string, articleId: string) => {
   const profile = await ProfileModel.findOne({ user_id: userId });
   if (!profile) throw new Error('Profile not found');
 
-  const isAlreadyLiked = profile.likedArticleTips?.some(id => id.toString() === articleId);
+  const isAlreadyLiked = profile.likedArticleTips?.some(
+    (id) => id.toString() === articleId,
+  );
 
   await ProfileModel.updateOne(
     { user_id: userId },
-    { [isAlreadyLiked ? '$pull' : '$addToSet']: { likedArticleTips: articleId } }
+    {
+      [isAlreadyLiked ? '$pull' : '$addToSet']: { likedArticleTips: articleId },
+    },
   );
 
   await TipArticleModel.updateOne(
     { _id: articleId },
-    { $inc: { favCount: isAlreadyLiked ? -1 : 1 } }
+    { $inc: { favCount: isAlreadyLiked ? -1 : 1 } },
   );
 
   return { liked: !isAlreadyLiked };
 };
 
-
 const getTipsByUserId = (userId: string) =>
   TipArticleModel.find({ userId }).sort({ createdAt: -1 });
 
-const getTipById = (id: string) =>
-  TipArticleModel.findById(id);
+const getTipById = (id: string) => TipArticleModel.findById(id);
 
-const updateTip = async (id: string, userId: string, data: Partial<TTipArticle>) => {
+const updateTip = async (
+  id: string,
+  userId: string,
+  data: Partial<TTipArticle>,
+) => {
   const tip = await TipArticleModel.findOne({ _id: id, userId });
   if (!tip) throw new Error("Tip not found or you're not the owner!");
 
