@@ -231,12 +231,83 @@ const result = await UserHabitsModel.find({user_id:user_id})
 return result 
 }
 
+const deleteHabit = async (habit_id: Types.ObjectId) => {
+  if (!habit_id) throw new Error("Habit ID is required.");
+
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
+
+    // Remove habit from habit collection
+    const deletedHabit = await habitModel.findByIdAndDelete(habit_id).session(session);
+    if (!deletedHabit) throw new Error("Habit not found.");
+
+    // Remove all user habit references
+    await UserHabitsModel.deleteMany({ habit_id }).session(session);
+
+    // Also remove from all user profiles' habits array
+    await ProfileModel.updateMany(
+      { habits: habit_id },
+      { $pull: { habits: habit_id } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    return { success: true, message: "Habit deleted successfully." };
+  } catch (error: any) {
+    await session.abortTransaction();
+    throw new Error(error.message || "Failed to delete habit.");
+  } finally {
+    session.endSession();
+  }
+};
+
+const deleteUserHabit = async (user_id: Types.ObjectId, habit_id: Types.ObjectId) => {
+  if (!user_id || !habit_id) throw new Error("User ID and habit ID are required.");
+
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
+
+    // 1. Delete the habit reference from UserHabitCollection
+    const deletedUserHabit = await UserHabitsModel.findOneAndDelete({
+      user_id,
+      habit_id,
+    }).session(session);
+
+    if (!deletedUserHabit) {
+      throw new Error("No user habit found for this habit ID.");
+    }
+
+    // 2. Remove the habit ID from user's profile
+    await ProfileModel.findOneAndUpdate(
+      { user_id },
+      { $pull: { habits: habit_id } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    return {
+      success: true,
+      message: "Habit successfully removed from user profile and habit collection.",
+    };
+  } catch (error: any) {
+    await session.abortTransaction();
+    throw new Error(error.message || "Failed to delete user habit.");
+  } finally {
+    session.endSession();
+  }
+};
+
+
 const habitServices = {
   createHabit,
   getHabit,
   addHabitToUser,
   updateUserHabit,
-  getUserHabits
+  getUserHabits,
+  deleteHabit,
+  deleteUserHabit
 };
 
 export default habitServices;

@@ -3,6 +3,6 @@ export type TTip = {
   description: string;
   video: string;
   tag: string[];
-  favCount: number;
+  favCount?: number;
   userId: string;
 };

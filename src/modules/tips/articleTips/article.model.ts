@@ -7,7 +7,7 @@ const TipSchema = new Schema<TTipArticle>(
     description: { type: String, required: true },
     image: { type: String },
     tag: [{ type: String }],
-    favCount: { type: Number, default: 0 },
+    favCount: { type: Number, required: false, default: 0 },
     userId: { type: String, required: true },
   },
   { timestamps: true }

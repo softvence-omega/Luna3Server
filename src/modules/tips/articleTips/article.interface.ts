@@ -3,7 +3,7 @@ export type TTipArticle = {
     description: string;
     image: string;
     tag: string[];
-    favCount: number;
+    favCount?: number;
     userId: string;
   };
   
