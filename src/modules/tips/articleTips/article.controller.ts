@@ -31,10 +31,33 @@ const createTip = async (req: Request, res: Response) => {
       res.status(400).json({ message: error.message });
     }
   };
+
+  const toggleSaveTip = async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const { id } = req.params;
+      const result = await TipService.toggleSave(userId, id);
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  };
+  
+  const toggleLikeTip = async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const { id } = req.params;
+      const result = await TipService.toggleLike(userId, id);
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  };
   
 
-const getAllTips = async (_req: Request, res: Response) => {
-  const tips = await TipService.getTips();
+const getAllTips = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  const tips = await TipService.getTips(userId);
   res.json(tips);
 };
 
@@ -138,4 +161,6 @@ export const TipController = {
   getMyTips,
   updateTip,
   deleteTip,
+  toggleLikeTip,
+  toggleSaveTip
 };

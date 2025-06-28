@@ -62,5 +62,9 @@ export type TProfile = {
   habits?: [Types.ObjectId]; // Optional to align with schema
   favoriteFood?:[Types.ObjectId];
   notificationList_id?: Types.ObjectId; // Optional to align with schema
+  savedArticleTips?: [Types.ObjectId];
+  likedArticleTips?: [Types.ObjectId];
+  savedVideoTips?: [Types.ObjectId];
+  likedVideoTips?: [Types.ObjectId];
   isDeleted?: boolean;
 };

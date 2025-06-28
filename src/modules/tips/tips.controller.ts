@@ -6,9 +6,8 @@ import { TTip } from './tips.interface';
 const createTip = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: 'Unauthorized! Please login with credentials!!!' });
-    }
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
 
     let parsedData;
     try {
@@ -20,10 +19,9 @@ const createTip = async (req: Request, res: Response) => {
     const tip = await TipService.createTip(
       {
         ...parsedData,
-        favCount: Number(parsedData.favCount) || 0,
         userId,
       },
-      req.file?.path
+      req.file?.path,
     );
 
     res.status(201).json(tip);
@@ -32,89 +30,55 @@ const createTip = async (req: Request, res: Response) => {
   }
 };
 
-
-const getAllTips = async (_req: Request, res: Response) => {
-  const tips = await TipService.getTips();
-  res.json(tips);
+const getAllTips = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const tips = await TipService.getTips(userId);
+    res.json(tips);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getTip = async (req: Request, res: Response) => {
-  const tip = await TipService.getTipById(req.params.id);
-  if (!tip) {
-    res.status(404).json({ message: 'Tip not found' });
-    return;
+  try {
+    const userId = req.user?.id;
+    const tip = await TipService.getTipById(req.params.id);
+    if (!tip) res.status(404).json({ message: 'Tip not found' });
+
+    res.json(tip);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
-  res.json(tip);
 };
 
 const getMyTips = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-
-    if (!userId) {
-      res
-        .status(401)
-        .json({ message: 'Unauthorized! Please login with credentials!!!' });
-      return;
-    }
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
 
     const tips = await TipService.getTipsByUserId(userId);
     res.json(tips);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
-
-// const updateTip = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.user?.id;
-//     const tip = await TipService.getTipById(req.params.id);
-
-//     if (!tip) {
-//       res.status(404).json({ message: 'Tip not found!' });
-//       return;
-//     }
-
-//     if (tip.userId !== userId) {
-//       res.status(403).json({ message: 'Forbidden! Not your tip.' });
-//       return;
-//     }
-
-//     // ✅ Parse 'data' from form-data
-//     let parsedData;
-//     try {
-//       parsedData = JSON.parse(req.body.data);
-//     } catch {
-//       res.status(400).json({ message: 'Invalid JSON format in "data"' });
-//       return;
-//     }
-
-//     const updatedTip = await TipService.updateTip(
-//       req.params.id,
-//       userId,
-//       parsedData,
-//     );
-
-//     res.json(updatedTip);
-//     return;
-//   } catch (error: any) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
 
 const updateTip = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const tip = await TipService.getTipById(req.params.id);
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
 
+    const tip = await TipService.getTipById(req.params.id);
     if (!tip) {
       res.status(404).json({ message: 'Tip not found!' });
       return;
     }
 
-    if (tip.userId !== userId) {
+    if (tip.userId !== userId)
       res.status(403).json({ message: 'Forbidden! Not your tip.' });
-    }
 
     let parsedData: Partial<TTip> = {};
 
@@ -126,12 +90,10 @@ const updateTip = async (req: Request, res: Response) => {
       }
     }
 
-    // Convert favCount if provided
     if (parsedData.favCount !== undefined) {
       parsedData.favCount = Number(parsedData.favCount) || 0;
     }
 
-    // Handle video upload or keep existing or overwrite with new link
     if (req.file?.path) {
       const name = parsedData.title || tip.title;
       const safeName = name.replace(/\s+/g, '-').toLowerCase();
@@ -139,32 +101,66 @@ const updateTip = async (req: Request, res: Response) => {
       parsedData.video = upload.secure_url;
     }
 
-    const updatedTip = await TipService.updateTip(req.params.id, userId, parsedData);
+    const updatedTip = await TipService.updateTip(req.params.id, userId);
     res.json(updatedTip);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
 };
 
-
-
 const deleteTip = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const tip = await TipService.getTipById(req.params.id);
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
 
+    const tip = await TipService.getTipById(req.params.id);
     if (!tip) {
       res.status(404).json({ message: 'Tip not found!' });
       return;
     }
 
-    if (tip.userId !== userId) {
+    if (tip.userId !== userId)
       res.status(403).json({ message: 'Forbidden! Not your tip.' });
-      return;
-    }
 
-    await TipService.deleteTip(req.params.id, userId);
+    await TipService.deleteTip(req.params.id);
     res.json({ message: 'Tip deleted successfully!' });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Toggle save (favorite) tip
+const toggleSaveTip = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
+
+    const tipId = req.params.id;
+    const result = await TipService.toggleSave(userId, tipId);
+    res.json({
+      message: `Tip ${result.saved ? 'saved' : 'unsaved'} successfully`,
+      saved: result.saved,
+    });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Toggle like tip
+const toggleLikeTip = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId)
+      res.status(401).json({ message: 'Unauthorized! Please login.' });
+
+    const tipId = req.params.id;
+    const result = await TipService.toggleLike(userId, tipId);
+    res.json({
+      message: `Tip ${result.liked ? 'liked' : 'unliked'} successfully`,
+      liked: result.liked,
+    });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
@@ -177,4 +173,6 @@ export const TipController = {
   getMyTips,
   updateTip,
   deleteTip,
+  toggleSaveTip,
+  toggleLikeTip,
 };

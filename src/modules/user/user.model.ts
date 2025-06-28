@@ -119,6 +119,26 @@ const ProfileSchema = new Schema<TProfile>(
       required: false, 
       ref: 'NotificationList' 
     },
+    savedArticleTips: {
+      type: [Schema.Types.ObjectId],
+      required: false,
+      ref: 'TipArticle'
+    },
+    likedArticleTips: {
+      type: [Schema.Types.ObjectId],
+      required: false,
+      ref: 'TipArticle'
+    },
+    savedVideoTips: {
+      type: [Schema.Types.ObjectId],
+      required: false,
+      ref: 'Tip'
+    },
+    likedVideoTips: {
+      type: [Schema.Types.ObjectId],
+      required: false,
+      ref: 'Tip'
+    },
     isDeleted: { type: Boolean, required: false, default: false },
   },
   { timestamps: true }
