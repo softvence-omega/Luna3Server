@@ -30,11 +30,39 @@ const createTip = async (req: Request, res: Response) => {
   }
 };
 
+// const getAllTips = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     const tips = await TipService.getTips(userId);
+//     res.json(tips);
+//   } catch (error: any) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 const getAllTips = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const tips = await TipService.getTips(userId);
-    res.json(tips);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string | undefined;
+
+    const { tips, total } = await TipService.getTips(
+      userId,
+      page,
+      limit,
+      search,
+    );
+
+    res.json({
+      data: tips,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
