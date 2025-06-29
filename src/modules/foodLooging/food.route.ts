@@ -26,6 +26,12 @@ foodRoutes.post(
   foodLoaderController.addConsumedFoodFromImgOrQRCodeOrFoodId,
 );
 
+foodRoutes.delete(
+  '/deleteConsumedFood/:id',
+  auth([userRole.admin, userRole.user]),
+  foodLoaderController.deleteConsumedFood,
+);
+
 foodRoutes.get(
   '/getAllFood',
   auth([userRole.admin, userRole.user]),

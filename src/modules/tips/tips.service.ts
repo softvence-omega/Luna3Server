@@ -159,6 +159,18 @@ const updateTip = (id: string, data: Partial<TTip>) =>
   TipModel.findByIdAndUpdate(id, data, { new: true });
 const deleteTip = (id: string) => TipModel.findByIdAndDelete(id);
 
+const getSavedTipsByUserId = async (userId: string) => {
+  const profile = await ProfileModel.findOne({ user_id: userId });
+  if (!profile) throw new Error('Profile not found');
+
+  const savedIds = profile.savedVideoTips || [];
+
+  const tips = await TipModel.find({ _id: { $in: savedIds } }).sort({ createdAt: -1 });
+
+  return tips;
+};
+
+
 export const TipService = {
   createTip,
   getTips,
@@ -168,4 +180,5 @@ export const TipService = {
   deleteTip,
   toggleSave,
   toggleLike,
+  getSavedTipsByUserId
 };

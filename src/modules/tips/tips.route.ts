@@ -17,4 +17,6 @@ tipsRoute.delete('/delete-tip/:id', auth([userRole.admin, userRole.user]), TipCo
 tipsRoute.patch('/save-tip/:id', auth([userRole.admin, userRole.user]), TipController.toggleSaveTip);
 tipsRoute.patch('/like-tip/:id', auth([userRole.admin, userRole.user]), TipController.toggleLikeTip);
 
+tipsRoute.get('/saved-videos', auth([userRole.user]), TipController.getSavedTips);
+
 export default tipsRoute;

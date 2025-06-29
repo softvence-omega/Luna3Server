@@ -260,6 +260,23 @@ const addConsumedFoodFromImgOrQRCodeOrFoodId = async (
   }
 };
 
+const deleteConsumedFood = async (foodId: string, user_id?: string) => {
+  if (!user_id) throw new Error('Unauthorized');
+
+  // Validate ObjectId format (optional but recommended)
+  if (!Types.ObjectId.isValid(foodId)) {
+    throw new Error('Invalid food ID');
+  }
+
+  const consumedFood = await UserConsumedFoodModel.findOne({ _id: foodId, user_id });
+  if (!consumedFood) throw new Error('Consumed food not found or unauthorized');
+
+  await UserConsumedFoodModel.deleteOne({ _id: foodId });
+
+  return { message: 'Consumed food deleted successfully' };
+};
+
+
 
 
 const getAllFood = async (user_id: Types.ObjectId): Promise<TFood[]> => {
@@ -431,7 +448,8 @@ const deleteFood = async (foodId: Types.ObjectId, userId: Types.ObjectId): Promi
 };
 
 const foodLoadingServices= {
-    addFoodManually,addPersonalizeFoodManually,addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood,updateFood,deleteFood
+    addFoodManually,addPersonalizeFoodManually,addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood,updateFood,deleteFood,
+    deleteConsumedFood
   }
 
   export default foodLoadingServices

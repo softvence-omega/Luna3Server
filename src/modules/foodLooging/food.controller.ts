@@ -94,6 +94,23 @@ const addConsumedFoodFromImgOrQRCodeOrFoodId = catchAsync(async (req, res) => {
 });
 
 
+const deleteConsumedFood = catchAsync(async (req, res) => {
+  const user_id = req.user?.id;
+  if (!user_id) throw new Error('Unauthorized');
+
+  const foodId = req.params.id;
+  if (!foodId) throw new Error('Consumed food ID is required');
+
+  const result = await foodLoadingServices.deleteConsumedFood(foodId, user_id);
+
+  res.status(200).json({
+    status: 'success',
+    message: result.message,
+  });
+});
+
+
+
 const getAllFood = catchAsync(async(req,res)=>{
   const user_id = req.user.id as string
   const convertedId = idConverter(user_id) as Types.ObjectId
@@ -175,7 +192,8 @@ const deleteFood = catchAsync(async (req, res) => {
 const foodLoaderController = {
   addFoodManually,
   addPersonalizeFoodManually,
-  addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood,updateFood,deleteFood
+  addConsumedFoodFromImgOrQRCodeOrFoodId,getAllFood,updateFood,deleteFood,
+  deleteConsumedFood
 };
 
 export default foodLoaderController;
