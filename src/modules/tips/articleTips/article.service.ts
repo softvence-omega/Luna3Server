@@ -164,6 +164,19 @@ const deleteTip = async (id: string, userId: string) => {
   return TipArticleModel.findByIdAndDelete(id);
 };
 
+const getSavedTipsByUserId = async (userId: string) => {
+  const profile = await ProfileModel.findOne({ user_id: userId });
+  if (!profile) throw new Error('Profile not found');
+
+  const savedIds = profile.savedArticleTips || [];
+
+  const tips = await TipArticleModel.find({
+    _id: { $in: savedIds },
+  }).sort({ createdAt: -1 });
+
+  return tips;
+};
+
 export const TipService = {
   createTip,
   getTips,
@@ -173,4 +186,5 @@ export const TipService = {
   deleteTip,
   toggleSave,
   toggleLike,
+  getSavedTipsByUserId
 };

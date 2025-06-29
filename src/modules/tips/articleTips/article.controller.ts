@@ -185,6 +185,21 @@ const deleteTip = async (req: Request, res: Response) => {
   }
 };
 
+const getSavedTips = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized!' });
+    }
+
+    const tips = await TipService.getSavedTipsByUserId(userId);
+    res.json(tips);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 export const TipController = {
   createTip,
   getAllTips,
@@ -194,4 +209,5 @@ export const TipController = {
   deleteTip,
   toggleLikeTip,
   toggleSaveTip,
+  getSavedTips
 };

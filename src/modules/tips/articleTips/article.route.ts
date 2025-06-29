@@ -8,8 +8,8 @@ const articleRoute = express.Router();
 
 articleRoute.post('/create-article', auth([userRole.admin]), upload.single('image'), TipController.createTip);
 
-articleRoute.patch('/save-article/:id', auth([userRole.user]), TipController.toggleSaveTip);
-articleRoute.patch('/like-article/:id', auth([userRole.user]), TipController.toggleLikeTip);
+articleRoute.patch('/save-article/:id', auth([userRole.admin, userRole.user]), TipController.toggleSaveTip);
+articleRoute.patch('/like-article/:id', auth([userRole.admin, userRole.user]), TipController.toggleLikeTip);
 
 articleRoute.get('/all-articles', auth([userRole.admin, userRole.user]), TipController.getAllTips);
 
@@ -20,5 +20,7 @@ articleRoute.get('/my-articles', auth([userRole.admin, userRole.user]), TipContr
 articleRoute.put('/update-article/:id', auth([userRole.admin]),upload.single('image'), TipController.updateTip);
 
 articleRoute.delete('/delete-article/:id', auth([userRole.admin, userRole.user]), TipController.deleteTip);
+
+articleRoute.get('/saved-articles', auth([userRole.user]), TipController.getSavedTips);
 
 export default articleRoute;
