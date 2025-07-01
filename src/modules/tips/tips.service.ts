@@ -159,15 +159,55 @@ const updateTip = (id: string, data: Partial<TTip>) =>
   TipModel.findByIdAndUpdate(id, data, { new: true });
 const deleteTip = (id: string) => TipModel.findByIdAndDelete(id);
 
-const getSavedTipsByUserId = async (userId: string) => {
+// const getSavedTipsByUserId = async (userId: string) => {
+//   const profile = await ProfileModel.findOne({ user_id: userId });
+//   if (!profile) throw new Error('Profile not found');
+
+//   const savedIds = profile.savedVideoTips || [];
+
+//   const tips = await TipModel.find({ _id: { $in: savedIds } }).sort({ createdAt: -1 });
+
+//   return tips;
+// };
+
+const getSavedTipsByUserId = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 10,
+  search: string = ''
+) => {
   const profile = await ProfileModel.findOne({ user_id: userId });
   if (!profile) throw new Error('Profile not found');
 
   const savedIds = profile.savedVideoTips || [];
 
-  const tips = await TipModel.find({ _id: { $in: savedIds } }).sort({ createdAt: -1 });
+  const query: any = {
+    _id: { $in: savedIds },
+  };
 
-  return tips;
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const total = await TipModel.countDocuments(query);
+
+  const tips = await TipModel.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return {
+    data: tips,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 
