@@ -13,14 +13,14 @@ articleRoute.patch('/like-article/:id', auth([userRole.admin, userRole.user]), T
 
 articleRoute.get('/all-articles', auth([userRole.admin, userRole.user]), TipController.getAllTips);
 
-articleRoute.get('/single-article/:id', TipController.getTip);
+articleRoute.get('/single-article/:id', auth([userRole.admin, userRole.user]), TipController.getTip);
 
 articleRoute.get('/my-articles', auth([userRole.admin, userRole.user]), TipController.getMyTips);
 
-articleRoute.put('/update-article/:id', auth([userRole.admin]),upload.single('image'), TipController.updateTip);
+articleRoute.put('/update-article/:id', auth([userRole.admin]), upload.single('image'), TipController.updateTip);
 
-articleRoute.delete('/delete-article/:id', auth([userRole.admin, userRole.user]), TipController.deleteTip);
+articleRoute.delete('/delete-article/:id', auth([userRole.admin]), TipController.deleteTip);
 
-articleRoute.get('/saved-articles', auth([userRole.user]), TipController.getSavedTips);
+articleRoute.get('/saved-articles', auth([userRole.admin, userRole.user]), TipController.getSavedTips);
 
 export default articleRoute;
