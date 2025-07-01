@@ -50,4 +50,12 @@ exerciseRoutes.patch(
   exerciseController.markExerciseAsCompleated
 );
 
+// Delete exercise by ID (Authenticated user or admin)
+exerciseRoutes.delete(
+  "/deleteExercise/:id",
+  auth([userRole.user, userRole.admin]),
+  exerciseController.deleteExercise
+);
+
+
 export default exerciseRoutes;
