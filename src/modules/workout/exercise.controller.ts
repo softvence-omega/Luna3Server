@@ -138,9 +138,34 @@ const getExerciseBothCommonAndPersonalize = catchAsync(async (req, res) => {
     });
   });
 
+  const deleteExercise = catchAsync(async (req, res) => {
+    const userId = req.user?.id;
+    const exerciseId = req.params.id;
+  
+    if (!userId) {
+      throw new Error("User not authenticated.");
+    }
+  
+    const convertedUserId = idConverter(userId) as Types.ObjectId;
+    const convertedExerciseId = idConverter(exerciseId) as Types.ObjectId;
+  
+    const result = await exerciseServicves.deleteExercise(
+      convertedExerciseId,
+      convertedUserId
+    );
+  
+    res.status(200).json(result);
+  });
+  
 
 const exerciseController = {
-    createCommonExercise,createPersonalizeExercise,getExerciseBothCommonAndPersonalize,getExerciseById,performExercise,markExerciseAsCompleated
+    createCommonExercise,
+    createPersonalizeExercise,
+    getExerciseBothCommonAndPersonalize,
+    getExerciseById,
+    performExercise,
+    markExerciseAsCompleated,
+    deleteExercise
 }
 
 export default exerciseController

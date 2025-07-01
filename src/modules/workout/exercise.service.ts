@@ -352,6 +352,32 @@ const markExerciseAsCompleated = async (
   }
 };
 
+const deleteExercise = async (
+  exerciseId: Types.ObjectId,
+  userId: Types.ObjectId
+) => {
+  // Validate exercise ID
+  if (!Types.ObjectId.isValid(exerciseId)) {
+    throw new Error("Invalid exercise ID");
+  }
+
+  // Find the exercise
+  const exercise = await ExerciseModel.findOne({ _id: exerciseId });
+  if (!exercise) {
+    throw new Error("Exercise not found");
+  }
+
+  // Only the owner or admin can delete
+  if (exercise.user_id && !exercise.user_id.equals(userId)) {
+    throw new Error("Not authorized to delete this exercise");
+  }
+
+  // Delete the exercise
+  await ExerciseModel.findByIdAndDelete(exerciseId);
+
+  return { success: true, message: "Exercise deleted successfully" };
+};
+
 
 const exerciseServicves = {
   createCommonExercise,
@@ -359,6 +385,7 @@ const exerciseServicves = {
   getExerciseBothCommonAndPersonalize,
   getExerciseById,
   performExercise,
-  markExerciseAsCompleated
+  markExerciseAsCompleated,
+  deleteExercise
 };
 export default exerciseServicves;
