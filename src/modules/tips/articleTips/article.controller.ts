@@ -185,6 +185,20 @@ const deleteTip = async (req: Request, res: Response) => {
   }
 };
 
+// const getSavedTips = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     if (!userId) {
+//       res.status(401).json({ message: 'Unauthorized!' });
+//     }
+
+//     const tips = await TipService.getSavedTipsByUserId(userId);
+//     res.json(tips);
+//   } catch (error: any) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 const getSavedTips = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -192,8 +206,12 @@ const getSavedTips = async (req: Request, res: Response) => {
       res.status(401).json({ message: 'Unauthorized!' });
     }
 
-    const tips = await TipService.getSavedTipsByUserId(userId);
-    res.json(tips);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || '';
+
+    const result = await TipService.getSavedTipsByUserId(userId, page, limit, search);
+    res.json(result);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

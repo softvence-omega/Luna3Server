@@ -164,18 +164,59 @@ const deleteTip = async (id: string, userId: string) => {
   return TipArticleModel.findByIdAndDelete(id);
 };
 
-const getSavedTipsByUserId = async (userId: string) => {
+// const getSavedTipsByUserId = async (userId: string) => {
+//   const profile = await ProfileModel.findOne({ user_id: userId });
+//   if (!profile) throw new Error('Profile not found');
+
+//   const savedIds = profile.savedArticleTips || [];
+
+//   const tips = await TipArticleModel.find({
+//     _id: { $in: savedIds },
+//   }).sort({ createdAt: -1 });
+
+//   return tips;
+// };
+
+const getSavedTipsByUserId = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 10,
+  search: string = ''
+) => {
   const profile = await ProfileModel.findOne({ user_id: userId });
   if (!profile) throw new Error('Profile not found');
 
   const savedIds = profile.savedArticleTips || [];
 
-  const tips = await TipArticleModel.find({
+  const query: any = {
     _id: { $in: savedIds },
-  }).sort({ createdAt: -1 });
+  };
 
-  return tips;
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },     // case-insensitive
+      { content: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const total = await TipArticleModel.countDocuments(query);
+
+  const tips = await TipArticleModel.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return {
+    data: tips,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
+
 
 export const TipService = {
   createTip,
