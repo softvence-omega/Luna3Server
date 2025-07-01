@@ -129,7 +129,7 @@ const updateTip = async (req: Request, res: Response) => {
       parsedData.video = upload.secure_url;
     }
 
-    const updatedTip = await TipService.updateTip(req.params.id, userId);
+    const updatedTip = await TipService.updateTip(req.params.id, parsedData);
     res.json(updatedTip);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
