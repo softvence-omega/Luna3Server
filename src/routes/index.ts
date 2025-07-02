@@ -9,6 +9,7 @@ import tipsRoute from '../modules/tips/tips.route';
 import articleRoute from '../modules/tips/articleTips/article.route';
 import analysisRoutes from '../modules/analysis/analysis.route';
 import foodAnalysisRoutes from '../modules/foodAnalysis/foodanalysis.route';
+import notificationRouter from '../modules/notifications/notification.route';
 
 const Routes = express.Router();
 // Array of module routes
@@ -52,6 +53,10 @@ const moduleRouts = [
   {
     path: '/foodAnalysis',
     router: foodAnalysisRoutes,
+  },
+  {
+    path: '/notifications',
+    router: notificationRouter,
   }
 ];
 
