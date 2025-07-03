@@ -56,11 +56,12 @@ const runAnalysis = catchAsync(async (req, res) => {
     // Validate filterParameter
     if(filterParameter)
     {
-      const validFilters: Array<"duration" | "volume" | "reps" | "totalCaloryBurn"> = [
+      const validFilters: Array<"duration" | "volume" | "reps" | "totalCaloryBurn"|"set"> = [
         "duration",
         "volume",
         "reps",
-        "totalCaloryBurn"
+        "totalCaloryBurn",
+        "set"
       ];
       if (!validFilters.includes(filterParameter as any)) {
         throw new Error("Invalid filter parameter");
@@ -72,7 +73,7 @@ const runAnalysis = catchAsync(async (req, res) => {
     const result = await analysisService.runAnalysis(
       convertedUserId,
       timeSpan as "7_days" | "30_days" | "60_days" | "90_days" | "yearly",
-      filterParameter as "duration" | "volume" | "reps" | "totalCaloryBurn",
+      filterParameter as "duration" | "volume" | "reps" | "totalCaloryBurn"|"set",
       exerciseId ? idConverter(exerciseId as string) as Types.ObjectId : undefined
     );
   
