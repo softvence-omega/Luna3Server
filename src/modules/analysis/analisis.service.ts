@@ -44,7 +44,7 @@ interface AnalysisResponse {
 const runAnalysis = async (
   user_id: Types.ObjectId,
   TimeSpan: "7_days" | "30_days" | "60_days" | "90_days" | "yearly",
-  filterParameter?: "duration" | "volume" | "reps" | "totalCaloryBurn",
+  filterParameter?: "duration" | "volume" | "reps" | "totalCaloryBurn"|"set",
   exercise_id?: Types.ObjectId
 ): Promise<AnalysisResponse> => {
   try {
