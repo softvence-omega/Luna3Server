@@ -52,7 +52,7 @@ const runAnalysis = async (
     if (exercise_id && !Types.ObjectId.isValid(exercise_id)) throw new Error("Invalid exercise ID");
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setHours(23, 59, 59, 999);
     let startDate: Date;
     const isYearly = TimeSpan === "yearly";
 
@@ -64,7 +64,7 @@ const runAnalysis = async (
       switch (TimeSpan) {
         case "7_days":
           startDate = new Date(today);
-          startDate.setDate(today.getDate() - 7); // 7 days including yesterday
+          startDate.setDate(today.getDate() - 6); // 7 days including yesterday
           break;
         case "30_days":
           startDate = new Date(today);
