@@ -147,9 +147,9 @@ const createUser = async (payload: Partial<TUser>, file?: any, method?: string) 
   }
 
   // Validate file
-  if (!file || !file.path) {
-    throw new Error('Image file is required.');
-  }
+  // if (!file || !file.path) {
+  //   throw new Error('Image file is required.');
+  // }
 
   // Check for existing user
   console.log('Checking if user exists');

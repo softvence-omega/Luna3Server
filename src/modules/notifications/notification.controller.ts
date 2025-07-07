@@ -75,12 +75,51 @@ const getAllNotificationForAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const deleteUserNotification = catchAsync(async (req, res) => {
+  const user_id = req.user.id;
+  const notification_id = req.params.id;
+
+  console.log('user_id :::: ', user_id, notification_id);
+
+  const result = await notificationServices.deleteUserNotification(
+    user_id,
+    notification_id,
+  );
+
+  console.log("Delete result:", result);
+
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Notification deleted successfully by user',
+    data: result,
+  });
+});
+
+const deleteAdminNotification = catchAsync(async (req, res) => {
+  const notification_id = idConverter(req.params.id);
+
+  const result = await notificationServices.deleteAdminNotification(
+    notification_id as Types.ObjectId,
+  );
+
+  golbalRespnseHandler(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Notification deleted successfully by admin',
+    data: result,
+  });
+});
+
+
 const notificationController = {
   getAllNotifications,
   viewSpecificNotification,
   sendNotificationFromAdmin,
   getAllNotificationForAdmin,
   getNotificationForNotificationBell,
+  deleteUserNotification,
+  deleteAdminNotification
 };
 
 export default notificationController;
