@@ -16,6 +16,7 @@ const notificationSchema = new Schema<TEachNotification>(
         'latest_job',
         'upgrade_plan',
         'admin_notification',
+        'habit_reminder',
       ],
       required: true,
     },
