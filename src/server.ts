@@ -4,20 +4,20 @@ import { Server } from "http";
 import adminSeeder from "./seeder/adminSeeder";
 import config from "./config";
 import habitReminder from "./util/habitReminder";
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process';
 
 
 
 let server: Server;
 
-async function syncTime() {
-  try {
-    execSync('ntpdate time.google.com');
-    console.log('Time synchronized with time.google.com at:', new Date().toISOString());
-  } catch (error) {
-    console.error('Error synchronizing time:', error);
-  }
-}
+// async function syncTime() {
+//   try {
+//     execSync('ntpdate time.google.com');
+//     console.log('Time synchronized with time.google.com at:', new Date().toISOString());
+//   } catch (error) {
+//     console.error('Error synchronizing time:', error);
+//   }
+// }
 
 async function main() {
   try {
