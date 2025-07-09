@@ -7,6 +7,7 @@ export type TEachNotification = {
     | 'interview_Progress'
     | 'latest_job'
     | 'upgrade_plan'
+    | 'habit_reminder'
     | 'admin_notification';
   notificationDetail: string;
   isSeen: boolean;
