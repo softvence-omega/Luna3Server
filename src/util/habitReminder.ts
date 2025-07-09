@@ -49,7 +49,8 @@ const habitReminder = async () => {
     // Query habits with push notifications enabled and matching day
     const habits = await UserHabitsModel.find({
       isPushNotification: true,
-    });
+    }).populate('habit_id');
+
     console.log('habbits', habits);
     if (!habits.length) {
       console.log(
@@ -70,8 +71,13 @@ const habitReminder = async () => {
         if (isSameOrLaterDay(now, reminderDate)) {
           // Check if current time matches reminderTime
           if (isSameMinute(now, reminderDate)) {
+            const habitName =
+              typeof habit_id === 'object' && 'name' in habit_id
+                ? (habit_id as any).name
+                : 'your habit';
+                
             console.log(
-              `Processing reminder for habit ${habit_id} (ID: ${_id}) for user ${user_id}, reminderTime: ${reminderTime.toISOString()} (BST: ${reminderDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`,
+              `Processing reminder for habit ${habitName} (ID: ${_id}) for user ${user_id}, reminderTime: ${reminderTime.toISOString()} (BST: ${reminderDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`,
             );
 
             // Send notification email (commented out as in original code)
@@ -79,14 +85,16 @@ const habitReminder = async () => {
               `Sending push notification email for habit ${habit_id}`,
             );
             try {
-              const subject = `⏰ Reminder for your habit!`;
-              const body = `This is a friendly reminder for your habit "${habit_id}" scheduled at ${new Date(reminderTime).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}. Stay consistent and keep going! 💪`;
+              const subject = `⏰ Stay on Track — Your Next Step Awaits!`;
+              const body = `Let's build strong habit of "${habitName}" scheduled at ${new Date(reminderTime).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}. Stay consistent and keep going! 💪`;
 
               const result = await sendSingleNotification(
-                new Types.ObjectId(user_id),
+                user_id,
                 subject,
                 body,
               );
+
+              console.log("Send Push Notification USERRR ::::: ", result);
               console.log(
                 `📩 Email status for habit ${habit_id}:`,
                 result.message,
