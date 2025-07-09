@@ -10,7 +10,7 @@ export const sendSingleNotification = async (
 ): Promise<{ success: boolean; message: string }> => {
   try {
     // Await MongoDB query to find user
-    const user = await UserModel.findOne({ userId }).exec();
+    const user = await UserModel.findById(userId).exec();
     if (!user || !user.fcmToken) {
       return {
         success: false,
@@ -18,6 +18,7 @@ export const sendSingleNotification = async (
       };
     }
 
+    console.log("fcm token :::::: ",user.fcmToken)
     const message = {
       notification: {
         title,
