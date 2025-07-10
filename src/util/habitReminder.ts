@@ -153,7 +153,7 @@ const habitReminder = async () => {
 
             await UserHabitsModel.updateOne(
               { _id: _id },
-              { $set: { reminderTime: newReminderTime.toISOString() } },
+              { $set: { reminderTime: newReminderTime } },
             );
             console.log(
               `Reminder time updated successfully for habit ${habit_id}`,
