@@ -105,7 +105,7 @@ const habitReminder = async () => {
 
             // Send notification email (commented out as in original code)
             console.log(
-              `Sending push notification email for habit ${habit_id}`,
+              `Sending push notification for habit ${habit_id}`,
             );
             try {
               const subject = `⏰ Stay on Track — Your Next Step Awaits!`;
@@ -122,11 +122,12 @@ const habitReminder = async () => {
                 `📩 Email status for habit ${habit_id}:`,
                 result.message,
               );
-              await sendSingleNotification(
-                new Types.ObjectId(user_id),
-                '🌟 Don’t Forget Your Habit!',
-                `Reminder: Your habit scheduled is now. Let’s keep the streak alive!`,
-              );
+
+              // await sendSingleNotification(
+              //   new Types.ObjectId(user_id),
+              //   '🌟 Don’t Forget Your Habit!',
+              //   `Reminder: Your habit scheduled is now. Let’s keep the streak alive!`,
+              // );
 
               console.log(
                 `Notification email sent successfully for habit=====>>>>>>>>> ${habit_id}`,
