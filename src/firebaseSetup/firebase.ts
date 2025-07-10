@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import serviceAccount from './luna-3-7e89c-firebase-adminsdk-fbsvc-7e2e4a0805.json';
+import serviceAccount from './luna-3-7e89c-firebase-adminsdk-fbsvc-f69f5f559c.json';
 
 admin.initializeApp({
   credential: admin.credential.cert({
