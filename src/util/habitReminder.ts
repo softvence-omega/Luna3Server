@@ -3,6 +3,7 @@ import admin from '../firebaseSetup/firebase';
 import cron from 'node-cron';
 import { UserHabitsModel } from '../modules/habits/habits.model'; // Adjust path as needed
 import { sendSingleNotification } from '../firebaseSetup/sendPushNotification';
+import axios from 'axios';
 
 // Utility function to check if date1 is same as or later than date2
 const isSameOrLaterDay = (date1: Date, date2: Date): boolean => {
@@ -41,6 +42,27 @@ const habitReminder = async () => {
       `Running habit reminder cron job at: ${now.toISOString()} (UTC), ${now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })} (BST)`,
     );
 
+    const serverTime = new Date();
+    console.log('Server time (UTC):', serverTime.toISOString());
+
+    const getGoogleServerTime = async () => {
+      try {
+        const response = await axios.head('https://www.google.com');
+        const dateHeader = response.headers.date;
+
+        if (dateHeader) {
+          const googleTime = new Date(dateHeader);
+          console.log('Google Server Time (UTC):', googleTime.toISOString());
+        } else {
+          console.log('Date header not found in Google response.');
+        }
+      } catch (error: any) {
+        console.error('Failed to fetch Google server time:', error.message);
+      }
+    };
+
+    getGoogleServerTime();
+
     // Get current day in UTC to match reminderTime
     const currentDay = now.toLocaleString('en-US', {
       weekday: 'long',
@@ -76,7 +98,7 @@ const habitReminder = async () => {
               typeof habit_id === 'object' && 'name' in habit_id
                 ? (habit_id as any).name
                 : 'your habit';
-                
+
             console.log(
               `Processing reminder for habit ${habitName} (ID: ${_id}) for user ${user_id}, reminderTime: ${reminderTime.toISOString()} (BST: ${reminderDate.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })})`,
             );
@@ -95,13 +117,16 @@ const habitReminder = async () => {
                 body,
               );
 
-              console.log("Send Push Notification USERRR ::::: ", result);
+              console.log('Send Push Notification USERRR ::::: ', result);
               console.log(
                 `📩 Email status for habit ${habit_id}:`,
                 result.message,
               );
-              await sendSingleNotification(new Types.ObjectId(user_id), '🌟 Don’t Forget Your Habit!',
-                `Reminder: Your habit scheduled is now. Let’s keep the streak alive!`);
+              await sendSingleNotification(
+                new Types.ObjectId(user_id),
+                '🌟 Don’t Forget Your Habit!',
+                `Reminder: Your habit scheduled is now. Let’s keep the streak alive!`,
+              );
 
               console.log(
                 `Notification email sent successfully for habit=====>>>>>>>>> ${habit_id}`,
@@ -165,8 +190,6 @@ cron.schedule('* * * * *', habitReminder, {
 
 export default habitReminder;
 
-
-
 // import { Types } from 'mongoose';
 // import admin from '../firebaseSetup/firebase';
 // import cron from 'node-cron';
@@ -225,7 +248,7 @@ export default habitReminder;
 
 // const habitReminder = async () => {
 //   console.log('Starting habit reminder cron job');
-  
+
 //   // Schedule the cron job to run every minute
 //   cron.schedule('* * * * *', async () => {
 //     try {
