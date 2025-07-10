@@ -130,9 +130,10 @@ const habitReminder = async () => {
               // );
 
               console.log(
-                `Notification email sent successfully for habit=====>>>>>>>>> ${habit_id}`,
+                `Notification  sent successfully for habit=====>>>>>>>>> ${habit_id}`,
               );
-            } catch (emailError: any) {
+            } 
+            catch (emailError: any) {
               console.error(
                 `Failed to send notification email for habit ${habit_id}:`,
                 emailError.message,
