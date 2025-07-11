@@ -417,7 +417,7 @@ const habitReminder = async () => {
 };
 
 // Schedule the cron job to run every minute
-console.log('Starting habit reminder cron');
+console.log('Starting habit reminder cron job');
 cron.schedule('* * * * *', habitReminder, {
   timezone: 'UTC',
 });
