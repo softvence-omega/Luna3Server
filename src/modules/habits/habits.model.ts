@@ -36,6 +36,10 @@ const UserHabitsSchema = new Schema<TUserHabits>({
     type: Date,
     required: true,
   },
+  nextReminderTime: {
+    type: Date,
+    required: true,
+  },
   reminderInterval: {
     type: Number,
     required: true,

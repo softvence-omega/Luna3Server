@@ -13,6 +13,7 @@ habitRoutes.post(
   upload.single('file'),
   habitController.createHabit,
 );
+
 habitRoutes.get('/getHabit', habitController.getHabit);
 
 habitRoutes.post(
@@ -20,11 +21,15 @@ habitRoutes.post(
   auth([userRole.admin, userRole.user]),
   habitController.addHabitToUser,
 );
+
+
 habitRoutes.post(
   '/updateUserHabit',
   auth([userRole.admin, userRole.user]),
   habitController.updateUserHabit,
 );
+
+
 habitRoutes.get(
   '/getUserHabits',
   auth([userRole.admin, userRole.user]),

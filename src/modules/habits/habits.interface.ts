@@ -11,7 +11,8 @@ export type TUserHabits= {
     habit_id:Types.ObjectId,
     isPushNotification:boolean,
     reminderTime:Date,
+    nextReminderTime:Date,
     reminderInterval:Number,
-    reminderDays:String[]
+    reminderDays:[String]
   }
 
