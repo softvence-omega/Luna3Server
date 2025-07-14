@@ -13,3 +13,6 @@ const PrivacyPolicySchema = new Schema<TPrivacyPolicy>(
 );
 
 export const PrivacyPolicyModel = model<TPrivacyPolicy>('PrivacyPolicy', PrivacyPolicySchema);
+
+
+//notification goas
