@@ -47,6 +47,7 @@ export const sendSingleNotification = async (
     const notification = await NotificationModel.create({
       user_id: userId,
       Profile_id: profile?._id,
+      notificationType: 'habit_reminder',
       notificationDetail: body,
     });
 
