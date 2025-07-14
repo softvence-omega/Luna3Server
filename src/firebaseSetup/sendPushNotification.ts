@@ -1,6 +1,10 @@
 import { Types } from 'mongoose';
-import { UserModel } from '../modules/user/user.model';
+import { ProfileModel, UserModel } from '../modules/user/user.model';
 import admin from './firebase';
+import {
+  NotificationListModel,
+  NotificationModel,
+} from '../modules/notifications/notification.model';
 
 // Utility function to send notification to a single user
 export const sendSingleNotification = async (
@@ -17,8 +21,14 @@ export const sendSingleNotification = async (
         message: `No user or FCM token found for userId: ${userId}`,
       };
     }
+    if (!user.notificationsEnabled || !user.fcmToken) {
+      return {
+        success: false,
+        message: `Notifications are disabled or no FCM token for userId: ${userId}`,
+      };
+    }
 
-    console.log("fcm token :::::: ",user.fcmToken)
+    console.log('fcm token :::::: ', user.fcmToken);
     const message = {
       notification: {
         title,
@@ -29,6 +39,32 @@ export const sendSingleNotification = async (
 
     // Await Firebase notification send
     await admin.messaging().send(message);
+
+    // Get the user's profile (if applicable)
+    const profile = await ProfileModel.findOne({ user_id: userId });
+
+    // 1. Create the Notification
+    const notification = await NotificationModel.create({
+      user_id: userId,
+      Profile_id: profile?._id,
+      notificationDetail: body,
+    });
+
+    // 2. Update or Create NotificationList
+    const list = await NotificationListModel.findOne({ user_id: userId });
+    if (list) {
+      list.notificationList.push(notification._id);
+      list.newNotification += 1;
+      await list.save();
+    } else {
+      await NotificationListModel.create({
+        user_id: userId,
+        Profile_id: profile?._id,
+        notificationList: [notification._id],
+        newNotification: 1,
+      });
+    }
+
     return { success: true, message: 'Notification sent successfully' };
   } catch (error) {
     console.error(`Error sending notification to userId: ${userId}`, error);
@@ -48,7 +84,12 @@ export const sendMultipleNotifications = async (
   failureCount?: number;
 }> => {
   try {
-    const users = await UserModel.find({ userId: { $in: userIds } }).exec();
+    const users = await UserModel.find({
+      userId: { $in: userIds },
+      notificationsEnabled: true,
+      fcmToken: { $ne: null },
+    }).exec();
+
     const tokens = users
       .filter((user) => user.fcmToken)
       .map((user) => user.fcmToken);
