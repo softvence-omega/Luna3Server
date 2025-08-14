@@ -27,7 +27,7 @@ async function main() {
     await adminSeeder()
     console.log("admin seeding done ===>><<+++")
     server = app.listen(config.port, () => {
-      console.log(` LUNA3 app listening on port ${config.port}`);
+      console.log(`Barbell app listening on port ${config.port}`);
     });
 
     await habitReminder()

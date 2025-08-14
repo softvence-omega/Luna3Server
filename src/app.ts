@@ -18,7 +18,7 @@ app.use(
 );
 
 app.get('/', (req, res) => {
-  res.send('Welcome to Luna 3..!');
+  res.send('Welcome to Barbell App..!');
 });
 
 // Routes

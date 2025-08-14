@@ -18,7 +18,7 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
       from: `${config.companyGmail}`,
       to,
       subject,
-      text: 'This E-mail is from LUNA',
+      text: 'This E-mail is from BARBELL App',
       html,
     });
 
