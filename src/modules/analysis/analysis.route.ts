@@ -5,8 +5,8 @@ import analysisController from "./analysis.controller"
 
 const analysisRoutes = express.Router()
 
-analysisRoutes.get("/getAllExerciseVariantPerformedByUser", auth([userRole.admin, userRole.admin]),analysisController.getAllExerciseVariantPerformedByUser )
+analysisRoutes.get("/getAllExerciseVariantPerformedByUser", auth([userRole.admin, userRole.user]),analysisController.getAllExerciseVariantPerformedByUser )
 
-analysisRoutes.get("/runAnalysis", auth([userRole.admin, userRole.admin]),analysisController.runAnalysis )
+analysisRoutes.get("/runAnalysis", auth([userRole.admin, userRole.user]),analysisController.runAnalysis )
 
 export default  analysisRoutes
