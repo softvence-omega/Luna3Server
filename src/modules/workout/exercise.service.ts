@@ -179,6 +179,7 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
   set: number;
   weightLifted?: number;
   reps: number;
+  timeToPerform: number;
   resetTime: number;
   isCompleted: boolean;
   totalCaloryBurn?: number;
@@ -241,6 +242,7 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
       set: payLoad.set,
       weightLifted: validatedWeightLifted,
       reps: payLoad.reps,
+      timeToPerform: payLoad.timeToPerform,
       resetTime: payLoad.resetTime,
       isCompleted: false,
     };
@@ -315,7 +317,7 @@ const markExerciseAsCompleated = async (
           headers: {
             'Content-Type': 'application/json'
           },
-          timeout: 10000
+          // timeout: 10000
         }
       );
 
