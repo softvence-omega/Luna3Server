@@ -15,7 +15,7 @@ export type TExercise = {
     set:number;
     weightLifted:number;
     reps:number;
-    timeToPerform:number;
+    timeToPerform?:number;
     resetTime:number;
     isCompleted:boolean;
     totalCaloryBurn:number;
