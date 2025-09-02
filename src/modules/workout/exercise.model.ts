@@ -62,7 +62,7 @@ const ExerciseSchema = new Schema<TExercise>({
     },
     timeToPerform: {
       type: Number,
-      required: true,
+      required: false,
     },
     isCompleted: {
       type: Boolean,
