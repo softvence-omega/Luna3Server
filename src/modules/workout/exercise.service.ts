@@ -179,7 +179,7 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
   set: number;
   weightLifted?: number;
   reps: number;
-  timeToPerform: number;
+  timeToPerform?: number;
   resetTime: number;
   isCompleted: boolean;
   totalCaloryBurn?: number;
