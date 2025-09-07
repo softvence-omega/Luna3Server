@@ -242,9 +242,10 @@ const performExercise = async (user_id: Types.ObjectId, payLoad: Partial<{
       set: payLoad.set,
       weightLifted: validatedWeightLifted,
       reps: payLoad.reps,
-      timeToPerform: payLoad.timeToPerform,
+     // timeToPerform: payLoad.timeToPerform,
       resetTime: payLoad.resetTime,
       isCompleted: false,
+      ...(payLoad.timeToPerform !== undefined && { timeToPerform: payLoad.timeToPerform }),
     };
 
     // Save to UserExercisePerformModel
