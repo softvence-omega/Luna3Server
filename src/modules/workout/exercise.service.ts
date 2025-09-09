@@ -303,7 +303,7 @@ const markExerciseAsCompleated = async (
       reps: performedExercise.reps,
       sets: performedExercise.set,
       resetTime: performedExercise.resetTime,
-      restTime: 1 // Assuming restTime is 1 minute for simplicity
+      restTime: performedExercise.resetTime 
     };
 
     console.log("Data for calorie count:", dataForCaloryCount);
